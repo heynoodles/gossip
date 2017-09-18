@@ -11,7 +11,8 @@ import com.gossip.visitor.EvalVisitor;
 public class Interpreter {
 
     public static void main(String[] args) {
-        String input = "(print ( + (+ 11 3) 2))";
+//        String input = "(print ( + (+ 11 3) 2))";
+        String input = Util.readFile("tests/test.gossip");
         GossipLexer lexer = new GossipLexer(input);
         GossipParser parser = new GossipParser(lexer, 2);
         HeteroAST expr = parser.parse();
