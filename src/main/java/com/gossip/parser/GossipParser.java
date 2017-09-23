@@ -1,15 +1,12 @@
 package com.gossip.parser;
 
 
-import com.gossip.ast.AddNode;
-import com.gossip.ast.HeteroAST;
-import com.gossip.ast.IntNode;
-import com.gossip.ast.PrintNode;
-import com.gossip.lexer.GossipLexer;
+import com.gossip.ast.*;
 import com.gossip.lexer.Lexer;
 import com.gossip.lexer.Token;
 import com.gossip.lexer.TokenType;
-import com.gossip.visitor.PrintVisitor;
+import com.gossip.symtab.SymbolTable;
+import com.gossip.symtab.VariableSymbol;
 
 /**
  * @author gaoxin.wei
@@ -22,8 +19,11 @@ import com.gossip.visitor.PrintVisitor;
  */
 public class GossipParser extends Parser {
 
-    public GossipParser(Lexer lexer, int k) {
+    private SymbolTable symbolTable;
+
+    public GossipParser(Lexer lexer, int k, SymbolTable symbolTable) {
         super(lexer, k);
+        this.symbolTable = symbolTable;
     }
 
     private HeteroAST s_expr() {
@@ -31,6 +31,12 @@ public class GossipParser extends Parser {
             HeteroAST intNode = new IntNode(LT(1));
             match(TokenType.INT);
             return intNode;
+        } else if (LT(1).type == TokenType.NAME) {
+            // 变量
+            HeteroAST nameNode = new NameNode(LT(1));
+            symbolTable.define(new VariableSymbol(nameNode.getToken().text, null));
+            match(TokenType.NAME);
+            return nameNode;
         } else if (LT(1).type == TokenType.PAREN_BEGIN) {
            return list();
         } else
@@ -50,6 +56,12 @@ public class GossipParser extends Parser {
             HeteroAST param = s_expr();
             match(TokenType.PAREN_END);
             return new PrintNode(new Token(TokenType.PRINT, "print"), param);
+        } else if (LT(1).type == TokenType.SETQ) {
+            match(TokenType.SETQ);
+            NameNode name = (NameNode) s_expr();
+            HeteroAST valNode = s_expr();
+            match(TokenType.PAREN_END);
+            return new SetqNode(new Token(TokenType.SETQ, "setq"), name, valNode);
         } else {
             throw new Error("parse element error");
         }
@@ -57,16 +69,11 @@ public class GossipParser extends Parser {
 
     // 入口
     public HeteroAST parse() {
-        return s_expr();
-    }
-
-    public static void main(String[] args) {
-        String input = "( + (+ 1 3) 2)";
-        GossipLexer lexer = new GossipLexer(input);
-        GossipParser parser = new GossipParser(lexer, 2);
-        HeteroAST expr = parser.s_expr();
-        PrintVisitor printVisitor = new PrintVisitor();
-        expr.visit(printVisitor);
+        MainNode mainNode = new MainNode();
+        while (LT(1) != null && !LT(1).equals(Token.EOF)) {
+            mainNode.addChild(s_expr());
+        }
+        return mainNode;
     }
 
 }

@@ -43,8 +43,10 @@ public class GossipLexer extends Lexer {
                 default:
                     if (isDigit()) {
                        return INT();
-                    } if (isPrint()) {
+                    } else if (isPrint()) {
                         return PRINT();
+                    } else if (isSetq()) {
+                        return SETQ();
                     } else if (isLETTER()) {
                         return NAME();
                     } else {
@@ -55,14 +57,24 @@ public class GossipLexer extends Lexer {
         return new Token(EOF_TYPE, "<EOF>");
     }
 
+    private Token SETQ() {
+        for (char c : "setq".toCharArray()) {
+            match(c);
+        }
+        return new Token(TokenType.SETQ, "setq");
+    }
+
+    private boolean isSetq() {
+        return lookAhead("setq");
+    }
 
     private boolean isPrint() {
         return lookAhead("print");
     }
 
     private Token PRINT() {
-        for (int i = 0; i < "print".length(); i++) {
-            consume();
+        for (char c : "print".toCharArray()) {
+            match(c);
         }
         return new Token(TokenType.PRINT, "print");
     }
@@ -90,7 +102,7 @@ public class GossipLexer extends Lexer {
     }
 
     private void WS() {
-        while (c == ' ' || c == '\t' || c == '\r') {
+        while (c == ' ' || c == '\t' || c == '\r' || c == '\n') {
             consume();
         }
     }

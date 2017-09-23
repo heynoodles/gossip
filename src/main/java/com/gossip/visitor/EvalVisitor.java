@@ -1,14 +1,23 @@
 package com.gossip.visitor;
 
-import com.gossip.ast.AddNode;
-import com.gossip.ast.HeteroAST;
-import com.gossip.ast.IntNode;
-import com.gossip.ast.PrintNode;
+import com.gossip.ast.*;
+import com.gossip.memory.MemorySpace;
+import com.gossip.symtab.SymbolTable;
+
 
 /**
  * Created by gaoxinwei on 2017/9/18.
  */
 public class EvalVisitor implements GossipVisitor {
+
+    private MemorySpace globalSpace;
+
+    private SymbolTable symbolTable;
+
+    public EvalVisitor(SymbolTable symbolTable, MemorySpace memorySpace) {
+        this.globalSpace = memorySpace;
+        this.symbolTable = symbolTable;
+    }
 
     private Object INT(IntNode node) {
         return Integer.valueOf(node.getToken().text);
@@ -26,13 +35,43 @@ public class EvalVisitor implements GossipVisitor {
         return val;
     }
 
+    private Object MAIN(MainNode mainNode) {
+        for (HeteroAST child : mainNode.getChildren()) {
+            visit(child);
+        }
+        return 1;
+    }
+
+    private Object SETQ(SetqNode node) {
+        NameNode var = node.getVar();
+        Object val = node.getVal().visit(this);
+        if (symbolTable.resolve(var.getToken().text) == null) {
+            throw new Error("cant resolve symbol: " + var.getToken().text);
+        }
+        globalSpace.put(var.getToken().text, val);
+        return null;
+    }
+
+    private Object NAME(NameNode node) {
+        if (symbolTable.resolve(node.getToken().text) == null) {
+            throw new Error("cant resolve symbol: " + node.getToken().text);
+        }
+        return globalSpace.get(node.getToken().text);
+    }
+
     public Object visit(HeteroAST node) {
-        if (node instanceof IntNode) {
+        if (node instanceof MainNode) {
+            return MAIN((MainNode) node);
+        } else if (node instanceof IntNode) {
            return INT((IntNode)node);
         } else if (node instanceof AddNode) {
             return ADD((AddNode)node);
         } else if (node instanceof PrintNode) {
             return PRINT((PrintNode)node);
+        } else if (node instanceof SetqNode) {
+            return SETQ((SetqNode) node);
+        } else if (node instanceof NameNode) {
+            return NAME((NameNode)node);
         } else {
             throw new Error("未知节点");
         }
