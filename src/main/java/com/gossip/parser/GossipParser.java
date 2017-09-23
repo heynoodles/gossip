@@ -47,7 +47,7 @@ public class GossipParser extends Parser {
             return new AddNode(new Token(TokenType.ADD, "+"), left, right);
         } else if (LT(1).type == TokenType.PRINT) {
             match(TokenType.PRINT);
-            HeteroAST param  = s_expr();
+            HeteroAST param = s_expr();
             match(TokenType.PAREN_END);
             return new PrintNode(new Token(TokenType.PRINT, "print"), param);
         } else {

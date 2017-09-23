@@ -37,6 +37,17 @@ public abstract class Lexer {
         }
     }
 
+    public boolean lookAhead(String val) {
+        char[] chars = val.toCharArray();
+        int q = p;
+        for (char c : chars) {
+            if (q >= input.length() || c != input.charAt(q++)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public abstract Token nextToken();
 
     public abstract String getTokenName(int tokenType);

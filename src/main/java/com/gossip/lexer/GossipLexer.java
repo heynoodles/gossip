@@ -44,7 +44,7 @@ public class GossipLexer extends Lexer {
                     if (isDigit()) {
                        return INT();
                     } if (isPrint()) {
-                        return new Token(TokenType.PRINT, "print");
+                        return PRINT();
                     } else if (isLETTER()) {
                         return NAME();
                     } else {
@@ -57,16 +57,14 @@ public class GossipLexer extends Lexer {
 
 
     private boolean isPrint() {
-        try {
-            match('p');
-            match('r');
-            match('i');
-            match('n');
-            match('t');
-            return true;
-        } catch (Error error) {
-            return false;
+        return lookAhead("print");
+    }
+
+    private Token PRINT() {
+        for (int i = 0; i < "print".length(); i++) {
+            consume();
         }
+        return new Token(TokenType.PRINT, "print");
     }
 
     private Token INT() {
