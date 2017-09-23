@@ -13,6 +13,7 @@ public class GossipLexer extends Lexer {
 
     public Token nextToken() {
         while (c != EOF) {
+            skipComments();
             switch (c) {
                 case ' ' :
                 case '\t':
@@ -106,6 +107,22 @@ public class GossipLexer extends Lexer {
             consume();
         }
     }
+
+
+    public boolean skipComments() {
+        boolean found = false;
+
+        if (lookAhead("--")) {
+            found = true;
+
+            // skip to line end
+            while (p < input.length() && input.charAt(p) != '\n') {
+                consume();
+            }
+        }
+        return found;
+    }
+
 
     public String getTokenName(int tokenType) {
         return TokenType.tokenNames[tokenType];
