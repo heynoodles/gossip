@@ -61,13 +61,17 @@ public class EvalVisitor implements GossipVisitor {
     }
 
     private Object NAME(NameNode node) {
+        // 变量
         String text = node.getToken().text;
         Symbol symbol = symbolTable.getSymbolWithName(text);
         if (symbol == null) {
             throw new Error("cant resolve symbol: " + text);
         }
-            // 变量
-        return getCurrentSpace().get(text);
+        MemorySpace memorySpace = getCurrentSpaceWithName(text);
+        if (memorySpace == null) {
+            throw new Error("cant resolve variable: " + text);
+        }
+        return memorySpace.get(text);
     }
 
     private Object CALL(CallNode callNode) {
@@ -109,11 +113,14 @@ public class EvalVisitor implements GossipVisitor {
         return result;
     }
 
-    private MemorySpace getCurrentSpace() {
-        if (stack.size() > 0) {
+    private MemorySpace getCurrentSpaceWithName(String name) {
+        if (stack.size() > 0 && stack.peek().get(name) != null) {
             return stack.peek();
         }
-        return globalSpace;
+        if (globalSpace.get(name) != null) {
+            return globalSpace;
+        }
+        return null;
     }
 
     public Object visit(HeteroAST node) {

@@ -1,8 +1,12 @@
+(setq step 100)
+
+(print step)
+
 (defun add (a b c)
     (+ a (+ b c)))
 
 (defun increment (a)
-    (+ a 1))
+    (+ a step))
 
 (print
     (increment (add 1 2 3)))

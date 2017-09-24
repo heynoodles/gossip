@@ -89,9 +89,9 @@ public class GossipParser extends Parser {
         NameNode funName = (NameNode)s_expr();
 
         // build scope
-        Scope currentScope = symbolTable.getCurrentScope();
-        MethodSymbol methodSymbol = new MethodSymbol(funName.getToken().text, currentScope);
-        currentScope.define(methodSymbol);
+        Scope previousScope = symbolTable.getCurrentScope();
+        MethodSymbol methodSymbol = new MethodSymbol(funName.getToken().text, previousScope);
+        previousScope.define(methodSymbol);
         symbolTable.setCurrentScope(methodSymbol);
 
         // parse params
@@ -113,7 +113,7 @@ public class GossipParser extends Parser {
         );
 
         methodSymbol.setFunctionNode(functionNode);
-        symbolTable.setCurrentScope(currentScope);
+        symbolTable.setCurrentScope(previousScope);
 
         return null;
     }
