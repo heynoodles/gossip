@@ -1,6 +1,8 @@
--- 支持setq
+-- assign
 (setq a 12)
-(setq b 100)
+(setq b (+ 100 a))
 
+-- print
+(print b)
 (print (+ a
     (+ 13 b)))

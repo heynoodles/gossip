@@ -7,6 +7,7 @@ package com.gossip.lexer;
  */
 public class GossipLexer extends Lexer {
 
+
     public GossipLexer(String input) {
         super(input);
     }
@@ -15,11 +16,12 @@ public class GossipLexer extends Lexer {
         while (c != EOF) {
             skipComments();
             switch (c) {
-                case ' ' :
+                case ' ':
                 case '\t':
                 case '\n':
                 case '\r':
-                    WS(); continue;
+                    WS();
+                    continue;
                 case ',':
                     consume();
                     return new Token(TokenType.COMMA, ",");
@@ -43,11 +45,13 @@ public class GossipLexer extends Lexer {
                     return new Token(TokenType.ADD, "+");
                 default:
                     if (isDigit()) {
-                       return INT();
+                        return INT();
                     } else if (isPrint()) {
                         return PRINT();
                     } else if (isSetq()) {
                         return SETQ();
+                    } else if (isDefun()) {
+                        return DEFUN();
                     } else if (isLETTER()) {
                         return NAME();
                     } else {
@@ -130,5 +134,16 @@ public class GossipLexer extends Lexer {
 
     boolean isLETTER() {
         return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+    }
+
+    private boolean isDefun() {
+        return lookAhead("defun");
+    }
+
+    private Token DEFUN() {
+        for (char c : "defun".toCharArray()) {
+            match(c);
+        }
+        return new Token(TokenType.DEFUN, "defun");
     }
 }

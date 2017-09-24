@@ -1,37 +1,38 @@
 package com.gossip.symtab;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * @author gaoxin.wei
  */
-public class SymbolTable implements Scope {
+public class SymbolTable {
 
-    Map<String, Symbol> symbols = new HashMap<String, Symbol>();
+    public GlobalScope globalScope = new GlobalScope();
 
-    public SymbolTable() {
-        initTypeSystem();
-    }
+    private Scope currentScope = globalScope;
 
-    private void initTypeSystem() {
-        define(new BuiltInTypeSymbol("int"));
-        define(new BuiltInTypeSymbol("float"));
-    }
-
-    public String getScopeName() {
-        return "global";
-    }
-
-    public Scope getEnclosingScope() {
+    public Symbol getSymbolWithName(String name) {
+        Symbol resolve = this.currentScope.resolve(name);
+        if (resolve != null) {
+            return resolve;
+        }
+        for (Scope currentScope = this.currentScope; currentScope.getEnclosingScope() != null;
+             currentScope = currentScope.getEnclosingScope()) {
+            Symbol resolve1 = currentScope.getEnclosingScope().resolve(name);
+            if (resolve1 != null) {
+                return resolve1;
+            }
+        }
         return null;
     }
 
-    public void define(Symbol sym) {
-        symbols.put(sym.getName(), sym);
+    public GlobalScope getGlobalScope() {
+        return globalScope;
     }
 
-    public Symbol resolve(String name) {
-        return symbols.get(name);
+    public Scope getCurrentScope() {
+        return currentScope;
+    }
+
+    public void setCurrentScope(Scope currentScope) {
+        this.currentScope = currentScope;
     }
 }

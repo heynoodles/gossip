@@ -10,7 +10,7 @@ public class MemorySpace {
 
     private String name;
 
-    private Map<String, Object> data = new HashMap<String, Object>();
+    private Map<String, Object> members = new HashMap<String, Object>();
 
     private MemorySpace() {}
 
@@ -19,10 +19,10 @@ public class MemorySpace {
     }
 
     public void put(String id, Object val) {
-        data.put(id, val);
+        members.put(id, val);
     }
 
     public Object get(String id) {
-        return data.get(id);
+        return members.get(id);
     }
 }

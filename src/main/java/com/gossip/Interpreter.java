@@ -12,14 +12,24 @@ import com.gossip.visitor.EvalVisitor;
  */
 public class Interpreter {
 
-    public static void main(String[] args) {
-        String input = Util.readFile("tests/test1.gossip");
+    private String file;
+
+    public Interpreter(String file) {
+        this.file = Util.readFile(file);
+    }
+
+    public void interp() {
         SymbolTable symbolTable = new SymbolTable();
         MemorySpace memorySpace = new MemorySpace("global");
-        GossipLexer lexer = new GossipLexer(input);
+        GossipLexer lexer = new GossipLexer(file);
         GossipParser parser = new GossipParser(lexer, 2, symbolTable);
         HeteroAST expr = parser.parse();
         expr.visit(new EvalVisitor(symbolTable, memorySpace));
+    }
+
+    public static void main(String[] args) {
+        new Interpreter("tests/test2.gossip")
+            .interp();
     }
 
 }

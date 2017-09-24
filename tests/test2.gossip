@@ -1,0 +1,8 @@
+(defun add (a b c)
+    (+ a (+ b c)))
+
+(defun increment (a)
+    (+ a 1))
+
+(print
+    (increment (add 1 2 3)))
