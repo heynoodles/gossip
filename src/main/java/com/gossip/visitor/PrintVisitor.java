@@ -3,6 +3,7 @@ package com.gossip.visitor;
 import com.gossip.ast.AddNode;
 import com.gossip.ast.HeteroAST;
 import com.gossip.ast.IntNode;
+import com.gossip.value.Value;
 
 /**
  * @author gaoxin.wei
@@ -19,7 +20,7 @@ public class PrintVisitor implements GossipVisitor {
         addNode.getRight().visit(this);
     }
 
-    public Object visit(HeteroAST node) {
+    public Value visit(HeteroAST node) {
         if (node instanceof IntNode) {
             visit((IntNode)node);
         } else if (node instanceof AddNode) {

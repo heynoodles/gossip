@@ -7,6 +7,8 @@ import com.gossip.symtab.MethodSymbol;
 import com.gossip.symtab.Scope;
 import com.gossip.symtab.Symbol;
 import com.gossip.symtab.SymbolTable;
+import com.gossip.value.IntValue;
+import com.gossip.value.Value;
 
 import java.util.Stack;
 
@@ -27,40 +29,41 @@ public class EvalVisitor implements GossipVisitor {
         this.symbolTable = symbolTable;
     }
 
-    private Object INT(IntNode node) {
-        return Integer.valueOf(node.getToken().text);
+    private IntValue INT(IntNode node) {
+        return new IntValue(Integer.valueOf(node.getToken().text));
     }
 
-    private Object ADD(AddNode addNode) {
-        Integer leftVal = (Integer) addNode.getLeft().visit(this);
-        Integer rightVal = (Integer) addNode.getRight().visit(this);
-        return leftVal + rightVal;
+    private Value ADD(AddNode addNode) {
+        // todo simplify to bind
+        IntValue leftVal = (IntValue)addNode.getLeft().visit(this);
+        IntValue rightVal = (IntValue) addNode.getRight().visit(this);
+        return new IntValue(leftVal.getValue() + rightVal.getValue());
     }
 
-    private Object PRINT(PrintNode printNode) {
-        Object val = printNode.getParam().visit(this);
+    private Value PRINT(PrintNode printNode) {
+        Value val = printNode.getParam().visit(this);
         System.out.println(val);
-        return val;
+        return Value.VOID;
     }
 
-    private Object MAIN(MainNode mainNode) {
+    private Value MAIN(MainNode mainNode) {
         for (HeteroAST child : mainNode.getChildren()) {
             visit(child);
         }
-        return 1;
+        return Value.VOID;
     }
 
-    private Object SETQ(SetqNode node) {
+    private Value SETQ(SetqNode node) {
         NameNode var = node.getVar();
-        Object val = node.getVal().visit(this);
+        Value val = node.getVal().visit(this);
         if (symbolTable.globalScope.resolve(var.getToken().text) == null) {
             throw new Error("cant resolve symbol: " + var.getToken().text);
         }
         globalSpace.put(var.getToken().text, val);
-        return null;
+        return Value.VOID;
     }
 
-    private Object NAME(NameNode node) {
+    private Value NAME(NameNode node) {
         // 变量
         String text = node.getToken().text;
         Symbol symbol = symbolTable.getSymbolWithName(text);
@@ -74,7 +77,7 @@ public class EvalVisitor implements GossipVisitor {
         return memorySpace.get(text);
     }
 
-    private Object CALL(CallNode callNode) {
+    private Value CALL(CallNode callNode) {
         // 1. 获取functionNode
         String funcName = callNode.getToken().text;
         Symbol symbol = symbolTable.getSymbolWithName(funcName);
@@ -102,7 +105,7 @@ public class EvalVisitor implements GossipVisitor {
         }
 
         // 5. call
-        Object result = visit(functionNode.getBody());
+        Value result = visit(functionNode.getBody());
 
         // 6. pop currentSpace
         stack.pop();
@@ -123,7 +126,7 @@ public class EvalVisitor implements GossipVisitor {
         return null;
     }
 
-    public Object visit(HeteroAST node) {
+    public Value visit(HeteroAST node) {
         if (node instanceof MainNode) {
             return MAIN((MainNode) node);
         } else if (node instanceof IntNode) {

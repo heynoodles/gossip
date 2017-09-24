@@ -1,6 +1,7 @@
 package com.gossip.ast;
 
 import com.gossip.lexer.Token;
+import com.gossip.value.Value;
 import com.gossip.visitor.GossipVisitor;
 
 /**
@@ -23,7 +24,7 @@ public class PrintNode extends HeteroAST {
         this.param = param;
     }
 
-    public Object visit(GossipVisitor visitor) {
+    public Value visit(GossipVisitor visitor) {
         return visitor.visit(this);
     }
 }

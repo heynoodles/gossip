@@ -5,6 +5,7 @@ import com.gossip.lexer.GossipLexer;
 import com.gossip.memory.MemorySpace;
 import com.gossip.parser.GossipParser;
 import com.gossip.symtab.SymbolTable;
+import com.gossip.util.Util;
 import com.gossip.visitor.EvalVisitor;
 
 /**

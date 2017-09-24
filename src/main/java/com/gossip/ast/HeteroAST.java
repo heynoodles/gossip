@@ -1,6 +1,7 @@
 package com.gossip.ast;
 
 import com.gossip.lexer.Token;
+import com.gossip.value.Value;
 import com.gossip.visitor.GossipVisitor;
 
 /**
@@ -24,5 +25,5 @@ public abstract class HeteroAST {
         this.token = token;
     }
 
-    public abstract Object visit(GossipVisitor visitor);
+    public abstract Value visit(GossipVisitor visitor);
 }

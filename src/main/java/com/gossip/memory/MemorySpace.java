@@ -1,5 +1,7 @@
 package com.gossip.memory;
 
+import com.gossip.value.Value;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,7 +12,7 @@ public class MemorySpace {
 
     private String name;
 
-    private Map<String, Object> members = new HashMap<String, Object>();
+    private Map<String, Value> members = new HashMap<String, Value>();
 
     private MemorySpace() {}
 
@@ -18,11 +20,11 @@ public class MemorySpace {
         this.name = name;
     }
 
-    public void put(String id, Object val) {
+    public void put(String id, Value val) {
         members.put(id, val);
     }
 
-    public Object get(String id) {
+    public Value get(String id) {
         return members.get(id);
     }
 }

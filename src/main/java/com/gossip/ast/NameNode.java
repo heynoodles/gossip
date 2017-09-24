@@ -1,6 +1,7 @@
 package com.gossip.ast;
 
 import com.gossip.lexer.Token;
+import com.gossip.value.Value;
 import com.gossip.visitor.GossipVisitor;
 
 /**
@@ -13,7 +14,7 @@ public class NameNode extends HeteroAST {
     }
 
     @Override
-    public Object visit(GossipVisitor visitor) {
+    public Value visit(GossipVisitor visitor) {
         return visitor.visit(this);
     }
 }

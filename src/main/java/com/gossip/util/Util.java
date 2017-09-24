@@ -1,4 +1,4 @@
-package com.gossip;
+package com.gossip.util;
 
 import java.io.File;
 import java.io.IOException;

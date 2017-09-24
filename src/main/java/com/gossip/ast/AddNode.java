@@ -1,6 +1,7 @@
 package com.gossip.ast;
 
 import com.gossip.lexer.Token;
+import com.gossip.value.Value;
 import com.gossip.visitor.GossipVisitor;
 
 /**
@@ -17,7 +18,7 @@ public class AddNode extends HeteroAST {
         this.right = right;
     }
 
-    public Object visit(GossipVisitor visitor) {
+    public Value visit(GossipVisitor visitor) {
         return visitor.visit(this);
     }
 

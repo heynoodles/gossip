@@ -1,11 +1,12 @@
 package com.gossip.visitor;
 
 import com.gossip.ast.HeteroAST;
+import com.gossip.value.Value;
 
 /**
  * @author gaoxin.wei
  */
 public interface GossipVisitor {
 
-    Object visit(HeteroAST node);
+    Value visit(HeteroAST node);
 }
