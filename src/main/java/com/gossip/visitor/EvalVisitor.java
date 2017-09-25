@@ -12,7 +12,6 @@ import com.gossip.value.IntValue;
 import com.gossip.value.Value;
 
 import java.util.Stack;
-import java.util.function.BiFunction;
 
 
 /**
@@ -36,14 +35,12 @@ public class EvalVisitor implements GossipVisitor {
     }
 
     private Value ADD(AddNode addNode) {
-        // todo simplify to bind
-//        return Binder.<IntValue, Integer>bind(Math::addExact, IntValue::getValue)
-//                .apply(
-//                        (IntValue)addNode.getLeft().visit(this),
-//                        (IntValue) addNode.getRight().visit(this));
-        IntValue leftVal = (IntValue)addNode.getLeft().visit(this);
-        IntValue rightVal = (IntValue) addNode.getRight().visit(this);
-        return new IntValue(leftVal.getValue() + rightVal.getValue());
+        return Binder.<Integer>lift(Math::addExact).apply(
+            addNode.getLeft().visit(this),
+            addNode.getRight().visit(this));
+//        IntValue leftVal = (IntValue)addNode.getLeft().visit(this);
+//        IntValue rightVal = (IntValue) addNode.getRight().visit(this);
+//        return new IntValue(leftVal.getValue() + rightVal.getValue());
     }
 
     private Value PRINT(PrintNode printNode) {
