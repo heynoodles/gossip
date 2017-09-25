@@ -38,9 +38,6 @@ public class EvalVisitor implements GossipVisitor {
         return Binder.<Integer>lift(Math::addExact).apply(
             addNode.getLeft().visit(this),
             addNode.getRight().visit(this));
-//        IntValue leftVal = (IntValue)addNode.getLeft().visit(this);
-//        IntValue rightVal = (IntValue) addNode.getRight().visit(this);
-//        return new IntValue(leftVal.getValue() + rightVal.getValue());
     }
 
     private Value PRINT(PrintNode printNode) {
@@ -119,6 +116,15 @@ public class EvalVisitor implements GossipVisitor {
         return result;
     }
 
+    private Value GT(GTNode node) {
+        Value left = node.getLeft().visit(this);
+        Value right = node.getRight().visit(this);
+        if (left instanceof IntValue && right instanceof IntValue) {
+            return ((IntValue) left).getValue() > ((IntValue) right).getValue() ? Value.TRUE : Value.FALSE;
+        }
+        throw new Error("eval gt run");
+    }
+
     private MemorySpace getCurrentSpaceWithName(String name) {
         if (stack.size() > 0 && stack.peek().get(name) != null) {
             return stack.peek();
@@ -142,11 +148,14 @@ public class EvalVisitor implements GossipVisitor {
             return SETQ((SetqNode) node);
         } else if (node instanceof NameNode) {
             return NAME((NameNode)node);
+        } else if (node instanceof GTNode) {
+            return GT((GTNode)node);
         } else if (node instanceof CallNode) {
             return CALL((CallNode)node);
         } else {
             throw new Error("未知节点");
         }
     }
+
 
 }

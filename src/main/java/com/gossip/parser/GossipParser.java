@@ -57,6 +57,8 @@ public class GossipParser extends Parser {
             result = setq();
         } else if (LT(1).type == TokenType.DEFUN) {
             defun();
+        } else if (LT(1).type == TokenType.GT) {
+            result = gt();
         } else if (LT(1).type == TokenType.NAME) {
             Symbol symbol = symbolTable.getSymbolWithName(LT(1).text);
             if (symbol != null && symbol instanceof MethodSymbol) {
@@ -68,6 +70,13 @@ public class GossipParser extends Parser {
         match(TokenType.PAREN_END);
 
         return result;
+    }
+
+    private HeteroAST gt() {
+        match(TokenType.GT);
+        HeteroAST left = s_expr();
+        HeteroAST right = s_expr();
+        return new GTNode(new Token(TokenType.GT, ">"), left, right);
     }
 
     private HeteroAST call() {

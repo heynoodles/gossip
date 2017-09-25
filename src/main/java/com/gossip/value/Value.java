@@ -17,6 +17,8 @@ public abstract class Value<T> implements Monad<T> {
     }
 
     public final static VoidValue VOID = new VoidValue();
+    public final static BoolValue TRUE = new BoolValue(true);
+    public final static BoolValue FALSE = new BoolValue(false);
 
     public abstract Value create(T value);
 

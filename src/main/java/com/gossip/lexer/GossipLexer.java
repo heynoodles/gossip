@@ -43,6 +43,9 @@ public class GossipLexer extends Lexer {
                 case '+':
                     consume();
                     return new Token(TokenType.ADD, "+");
+                case '>':
+                    consume();
+                    return new Token(TokenType.GT, ">");
                 default:
                     if (isDigit()) {
                         return INT();
@@ -146,4 +149,5 @@ public class GossipLexer extends Lexer {
         }
         return new Token(TokenType.DEFUN, "defun");
     }
+
 }

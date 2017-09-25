@@ -7,9 +7,9 @@ import com.gossip.visitor.GossipVisitor;
 /**
  * @author gaoxin.wei
  */
-public class AddNode extends BiNode {
+public class GTNode extends BiNode {
 
-    public AddNode(Token root, HeteroAST left, HeteroAST right) {
+    public GTNode(Token root, HeteroAST left, HeteroAST right) {
         super(root, left, right);
     }
 
