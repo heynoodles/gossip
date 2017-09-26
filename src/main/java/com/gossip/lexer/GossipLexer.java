@@ -53,6 +53,8 @@ public class GossipLexer extends Lexer {
                         return PRINT();
                     } else if (isSetq()) {
                         return SETQ();
+                    } else if (isCond()) {
+                        return COND();
                     } else if (isDefun()) {
                         return DEFUN();
                     } else if (isLETTER()) {
@@ -63,6 +65,17 @@ public class GossipLexer extends Lexer {
             }
         }
         return new Token(EOF_TYPE, "<EOF>");
+    }
+
+    private boolean isCond() {
+        return lookAhead("cond");
+    }
+
+    private Token COND() {
+        for (char c : "cond".toCharArray()) {
+            match(c);
+        }
+        return new Token(TokenType.COND, "cond");
     }
 
     private Token SETQ() {

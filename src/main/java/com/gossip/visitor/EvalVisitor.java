@@ -8,6 +8,7 @@ import com.gossip.symtab.Scope;
 import com.gossip.symtab.Symbol;
 import com.gossip.symtab.SymbolTable;
 import com.gossip.util.Binder;
+import com.gossip.value.BoolValue;
 import com.gossip.value.IntValue;
 import com.gossip.value.Value;
 
@@ -125,6 +126,18 @@ public class EvalVisitor implements GossipVisitor {
         throw new Error("eval gt run");
     }
 
+    private Value COND(CondNode node) {
+        for (TestAndActionNode block : node.getBlocks()) {
+            BoolValue testVal = (BoolValue) block.getTest().visit(this);
+            if (testVal.getValue()) {
+                block.getAction().visit(this);
+                return Value.VOID;
+            }
+        }
+        return Value.VOID;
+    }
+
+
     private MemorySpace getCurrentSpaceWithName(String name) {
         if (stack.size() > 0 && stack.peek().get(name) != null) {
             return stack.peek();
@@ -152,6 +165,8 @@ public class EvalVisitor implements GossipVisitor {
             return GT((GTNode)node);
         } else if (node instanceof CallNode) {
             return CALL((CallNode)node);
+        } else if (node instanceof CondNode) {
+            return COND((CondNode)node);
         } else {
             throw new Error("未知节点");
         }

@@ -7,6 +7,7 @@ import com.gossip.lexer.Token;
 import com.gossip.lexer.TokenType;
 import com.gossip.symtab.*;
 
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,6 +60,8 @@ public class GossipParser extends Parser {
             defun();
         } else if (LT(1).type == TokenType.GT) {
             result = gt();
+        } else if (LT(1).type == TokenType.COND) {
+            result = cond();
         } else if (LT(1).type == TokenType.NAME) {
             Symbol symbol = symbolTable.getSymbolWithName(LT(1).text);
             if (symbol != null && symbol instanceof MethodSymbol) {
@@ -70,6 +73,22 @@ public class GossipParser extends Parser {
         match(TokenType.PAREN_END);
 
         return result;
+    }
+
+    private HeteroAST cond() {
+        // (cond (pred1 exec1)
+        //       (pred2 exec2))
+        match(TokenType.COND);
+        List<TestAndActionNode> blocks = new ArrayList<TestAndActionNode>();
+        while (LT(1).type == TokenType.PAREN_BEGIN) {
+            match(TokenType.PAREN_BEGIN);
+            HeteroAST test = s_expr();
+            HeteroAST action = s_expr();
+            match(TokenType.PAREN_END);
+            TestAndActionNode block = new TestAndActionNode(test, action);
+            blocks.add(block);
+        }
+        return new CondNode(new Token(TokenType.COND, "cond"), blocks);
     }
 
     private HeteroAST gt() {

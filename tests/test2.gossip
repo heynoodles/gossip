@@ -11,5 +11,9 @@
 (print
     (increment (add 1 2 3)))
 
--- >
+-- gt
 (print (> 2 1))
+
+-- cond
+(cond ((> step 99) (print 1))
+      ((> step 101) (print 2)))
