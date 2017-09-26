@@ -1,7 +1,9 @@
+-- assign
 (setq step 100)
 
 (print step)
 
+-- function
 (defun add (a b c)
     (+ a (+ b c)))
 
@@ -13,6 +15,12 @@
 
 -- gt
 (print (> 2 1))
+
+-- lt
+(print (< 2 1))
+
+-- eq
+(print (= 2 1))
 
 -- cond
 (cond ((> step 99) (print 1))

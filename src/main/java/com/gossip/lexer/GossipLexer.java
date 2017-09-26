@@ -31,9 +31,6 @@ public class GossipLexer extends Lexer {
                 case ']':
                     consume();
                     return new Token(TokenType.RBRACK, "]");
-                case '=':
-                    consume();
-                    return new Token(TokenType.EQUALS, "=");
                 case '(':
                     consume();
                     return new Token(TokenType.PAREN_BEGIN, "(");
@@ -43,9 +40,18 @@ public class GossipLexer extends Lexer {
                 case '+':
                     consume();
                     return new Token(TokenType.ADD, "+");
+                case '-':
+                    consume();
+                    return new Token(TokenType.MINUS, "-");
                 case '>':
                     consume();
                     return new Token(TokenType.GT, ">");
+                case '<':
+                    consume();
+                    return new Token(TokenType.LT, "<");
+                case '=':
+                    consume();
+                    return new Token(TokenType.EQ, "=");
                 default:
                     if (isDigit()) {
                         return INT();

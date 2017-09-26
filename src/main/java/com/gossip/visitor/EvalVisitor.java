@@ -41,6 +41,12 @@ public class EvalVisitor implements GossipVisitor {
             addNode.getRight().visit(this));
     }
 
+    private Value MINUS(MinusNode minusNode) {
+        return Binder.<Integer>lift(Math::subtractExact).apply(
+                minusNode.getLeft().visit(this),
+                minusNode.getRight().visit(this));
+    }
+
     private Value PRINT(PrintNode printNode) {
         Value val = printNode.getParam().visit(this);
         System.out.println(val);
@@ -79,7 +85,7 @@ public class EvalVisitor implements GossipVisitor {
     }
 
     private Value CALL(CallNode callNode) {
-        // 1. 获取functionNode
+        // 获取functionNode
         String funcName = callNode.getToken().text;
         Symbol symbol = symbolTable.getSymbolWithName(funcName);
         if (symbol == null) {
@@ -87,16 +93,9 @@ public class EvalVisitor implements GossipVisitor {
         }
         MethodSymbol methodSymbol = (MethodSymbol) symbol;
         FunctionNode functionNode = methodSymbol.getFunctionNode();
-
-        // 2. 设置currentScope
-        Scope previousScope = symbolTable.getCurrentScope();
-        symbolTable.setCurrentScope(methodSymbol);
-
-        // 3. 设置currentSpace
         FunctionSpace fs = new FunctionSpace(funcName, functionNode);
-        stack.push(fs);
 
-        // 4. prepare args in currentSpace
+        // prepare args in currentSpace
         for (int i = 0; i < functionNode.getParams().size(); i++) {
             NameNode nameNode = functionNode.getParams().get(i);
             if (i < callNode.getParams().size()) {
@@ -105,13 +104,20 @@ public class EvalVisitor implements GossipVisitor {
             }
         }
 
-        // 5. call
+        // 设置currentScope
+        Scope previousScope = symbolTable.getCurrentScope();
+        symbolTable.setCurrentScope(methodSymbol);
+
+        // 设置currentSpace
+        stack.push(fs);
+
+        // call
         Value result = visit(functionNode.getBody());
 
-        // 6. pop currentSpace
+        // pop currentSpace
         stack.pop();
 
-        // 7. pop currentScope
+        // pop currentScope
         symbolTable.setCurrentScope(previousScope);
 
         return result;
@@ -126,12 +132,30 @@ public class EvalVisitor implements GossipVisitor {
         throw new Error("eval gt run");
     }
 
+    private Value LT(LTNode node) {
+        Value left = node.getLeft().visit(this);
+        Value right = node.getRight().visit(this);
+        if (left instanceof IntValue && right instanceof IntValue) {
+            return ((IntValue) left).getValue() < ((IntValue) right).getValue() ? Value.TRUE : Value.FALSE;
+        }
+        throw new Error("eval lt run");
+    }
+
+    private Value EQ(EQNode node) {
+        Value left = node.getLeft().visit(this);
+        Value right = node.getRight().visit(this);
+        if (left instanceof IntValue && right instanceof IntValue) {
+            return ((IntValue) left).getValue().intValue() == ((IntValue) right).getValue()
+                    ? Value.TRUE : Value.FALSE;
+        }
+        throw new Error("eval eq run");
+    }
+
     private Value COND(CondNode node) {
         for (TestAndActionNode block : node.getBlocks()) {
             BoolValue testVal = (BoolValue) block.getTest().visit(this);
             if (testVal.getValue()) {
-                block.getAction().visit(this);
-                return Value.VOID;
+                return block.getAction().visit(this);
             }
         }
         return Value.VOID;
@@ -155,6 +179,8 @@ public class EvalVisitor implements GossipVisitor {
            return INT((IntNode)node);
         } else if (node instanceof AddNode) {
             return ADD((AddNode)node);
+        } else if (node instanceof MinusNode) {
+            return MINUS((MinusNode)node);
         } else if (node instanceof PrintNode) {
             return PRINT((PrintNode)node);
         } else if (node instanceof SetqNode) {
@@ -163,6 +189,10 @@ public class EvalVisitor implements GossipVisitor {
             return NAME((NameNode)node);
         } else if (node instanceof GTNode) {
             return GT((GTNode)node);
+        } else if (node instanceof LTNode) {
+            return LT((LTNode) node);
+        } else if (node instanceof EQNode) {
+            return EQ((EQNode)node);
         } else if (node instanceof CallNode) {
             return CALL((CallNode)node);
         } else if (node instanceof CondNode) {

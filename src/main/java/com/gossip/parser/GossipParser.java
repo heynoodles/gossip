@@ -52,6 +52,8 @@ public class GossipParser extends Parser {
         match(TokenType.PAREN_BEGIN);
         if (LT(1).type == TokenType.ADD) {
             result = add();
+        } else if (LT(1).type == TokenType.MINUS) {
+            result = minus();
         } else if (LT(1).type == TokenType.PRINT) {
             result = print();
         } else if (LT(1).type == TokenType.SETQ) {
@@ -60,6 +62,10 @@ public class GossipParser extends Parser {
             defun();
         } else if (LT(1).type == TokenType.GT) {
             result = gt();
+        } else if (LT(1).type == TokenType.LT) {
+            result = lt();
+        } else if (LT(1).type == TokenType.EQ) {
+            result = eq();
         } else if (LT(1).type == TokenType.COND) {
             result = cond();
         } else if (LT(1).type == TokenType.NAME) {
@@ -73,6 +79,20 @@ public class GossipParser extends Parser {
         match(TokenType.PAREN_END);
 
         return result;
+    }
+
+    private HeteroAST lt() {
+        match(TokenType.LT);
+        HeteroAST left = s_expr();
+        HeteroAST right = s_expr();
+        return new LTNode(new Token(TokenType.LT, "<"), left, right);
+    }
+
+    private HeteroAST eq() {
+        match(TokenType.EQ);
+        HeteroAST left = s_expr();
+        HeteroAST right = s_expr();
+        return new EQNode(new Token(TokenType.EQ, "="), left, right);
     }
 
     private HeteroAST cond() {
@@ -164,6 +184,13 @@ public class GossipParser extends Parser {
         HeteroAST left = s_expr();
         HeteroAST right = s_expr();
         return new AddNode(new Token(TokenType.ADD, "+"), left, right);
+    }
+
+    private HeteroAST minus() {
+        match(TokenType.MINUS);
+        HeteroAST left = s_expr();
+        HeteroAST right = s_expr();
+        return new MinusNode(new Token(TokenType.MINUS, "-"), left, right);
     }
 
     // 入口
