@@ -29,7 +29,7 @@ public class Interpreter {
     }
 
     public static void main(String[] args) {
-        new Interpreter("tests/fibonacci.gossip")
+        new Interpreter("tests/test2.gossip")
             .interp();
     }
 

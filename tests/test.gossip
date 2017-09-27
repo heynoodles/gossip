@@ -1,1 +1,6 @@
 (print ( + (+ 11 3) 2))
+
+-- string
+(print "hello gossip!")
+(setq str "haha")
+(print str)

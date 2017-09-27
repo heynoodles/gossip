@@ -10,6 +10,7 @@ import com.gossip.symtab.SymbolTable;
 import com.gossip.util.Binder;
 import com.gossip.value.BoolValue;
 import com.gossip.value.IntValue;
+import com.gossip.value.StringValue;
 import com.gossip.value.Value;
 
 import java.util.Stack;
@@ -33,6 +34,10 @@ public class EvalVisitor implements GossipVisitor {
 
     private IntValue INT(IntNode node) {
         return new IntValue(Integer.valueOf(node.getToken().text));
+    }
+
+    private StringValue STRING(StringNode node) {
+        return new StringValue(node.getToken().text);
     }
 
     private Value ADD(AddNode addNode) {
@@ -177,6 +182,8 @@ public class EvalVisitor implements GossipVisitor {
             return MAIN((MainNode) node);
         } else if (node instanceof IntNode) {
            return INT((IntNode)node);
+        } else if (node instanceof StringNode) {
+            return STRING((StringNode)node);
         } else if (node instanceof AddNode) {
             return ADD((AddNode)node);
         } else if (node instanceof MinusNode) {

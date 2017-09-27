@@ -7,7 +7,6 @@ import com.gossip.lexer.Token;
 import com.gossip.lexer.TokenType;
 import com.gossip.symtab.*;
 
-import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +15,7 @@ import java.util.List;
  * @author gaoxin.wei
  * 语法如下：
  * -------------------------------------------
- * s_expr : INT | NAME | list
+ * s_expr : INT | STRING | NAME | list
  * list: '(' s_exp < s_exp > ')'
  *  ------------------------------------------
  */
@@ -34,6 +33,10 @@ public class GossipParser extends Parser {
             HeteroAST intNode = new IntNode(LT(1));
             match(TokenType.INT);
             return intNode;
+        } else if (LT(1).type == TokenType.STRING) {
+            HeteroAST strNode = new StringNode(LT(1));
+            match(TokenType.STRING);
+            return strNode;
         } else if (LT(1).type == TokenType.NAME) {
             // 变量
             HeteroAST nameNode = new NameNode(LT(1));

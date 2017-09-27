@@ -23,5 +23,5 @@
 (print (= 2 1))
 
 -- cond
-(cond ((> step 99) (print 1))
-      ((> step 101) (print 2)))
+(cond ((> step 99) (print "greater than 99"))
+      ((> step 101) (print "greater than 101")))

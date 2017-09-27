@@ -7,7 +7,6 @@ package com.gossip.lexer;
  */
 public class GossipLexer extends Lexer {
 
-
     public GossipLexer(String input) {
         super(input);
     }
@@ -55,6 +54,8 @@ public class GossipLexer extends Lexer {
                 default:
                     if (isDigit()) {
                         return INT();
+                    } else if (isString()) {
+                        return STRING();
                     } else if (isPrint()) {
                         return PRINT();
                     } else if (isSetq()) {
@@ -71,6 +72,21 @@ public class GossipLexer extends Lexer {
             }
         }
         return new Token(EOF_TYPE, "<EOF>");
+    }
+
+    private boolean isString() {
+        return c == '"';
+    }
+
+    private Token STRING() {
+        match('"');
+        StringBuilder buf = new StringBuilder();
+        while (c != '"') {
+            buf.append(c);
+            consume();
+        }
+        match('"');
+        return new Token(TokenType.STRING, buf.toString());
     }
 
     private boolean isCond() {
@@ -152,6 +168,10 @@ public class GossipLexer extends Lexer {
 
     public String getTokenName(int tokenType) {
         return TokenType.tokenNames[tokenType];
+    }
+
+    boolean isLetterOrDigit() {
+        return isLETTER() || isDigit();
     }
 
     boolean isLETTER() {
