@@ -6,31 +6,60 @@ import com.gossip.memory.MemorySpace;
 import com.gossip.parser.GossipParser;
 import com.gossip.symtab.SymbolTable;
 import com.gossip.util.Util;
+import com.gossip.value.Value;
 import com.gossip.visitor.EvalVisitor;
+
+import java.util.Scanner;
 
 /**
  * @author gaoxin.wei
  */
 public class Interpreter {
 
-    private String file;
+    private String fileContent;
+
+    private SymbolTable symbolTable = new SymbolTable();
+
+    private MemorySpace memorySpace = new MemorySpace("global");
 
     public Interpreter(String file) {
-        this.file = Util.readFile(file);
+        this.fileContent = Util.readFile(file);
     }
 
-    public void interp() {
-        SymbolTable symbolTable = new SymbolTable();
-        MemorySpace memorySpace = new MemorySpace("global");
-        GossipLexer lexer = new GossipLexer(file);
+    public Interpreter() {}
+
+    public Value interp() {
+        GossipLexer lexer = new GossipLexer(fileContent);
         GossipParser parser = new GossipParser(lexer, 2, symbolTable);
         HeteroAST expr = parser.parse();
-        expr.visit(new EvalVisitor(symbolTable, memorySpace));
+        return expr.visit(new EvalVisitor(symbolTable, memorySpace));
+    }
+
+    public void repl() {
+        System.out.println("Welcome to Gossip REPL v1.0");
+        System.out.println("see: https://github.com/heynoodles/gossip");
+        System.out.println("");
+        System.out.println("Type in expressions for evaluation. Or :quit for quit.");
+        System.out.println("");
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("gossip> ");
+        while (scanner.hasNextLine()) {
+            String code = scanner.nextLine();
+            if (":quit".equalsIgnoreCase(code)) {
+                return;
+            }
+            this.fileContent = code;
+            System.out.println(interp());
+            System.out.print("gossip> ");
+        }
     }
 
     public static void main(String[] args) {
-        new Interpreter("tests/test2.gossip")
-            .interp();
+//        new Interpreter("tests/test2.gossip")
+//            .interp();
+
+        Interpreter interpreter = new Interpreter();
+        interpreter.repl();
     }
 
 }

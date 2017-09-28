@@ -59,10 +59,11 @@ public class EvalVisitor implements GossipVisitor {
     }
 
     private Value MAIN(MainNode mainNode) {
+        Value result = Value.VOID;
         for (HeteroAST child : mainNode.getChildren()) {
-            visit(child);
+           result = visit(child);
         }
-        return Value.VOID;
+        return result;
     }
 
     private Value SETQ(SetqNode node) {
