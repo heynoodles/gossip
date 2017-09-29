@@ -133,6 +133,13 @@ public class GossipParser extends Parser {
         return new CarNode(new Token(TokenType.CAR, "car"), node);
     }
 
+    private HeteroAST cdr() {
+        // (cdr cons1)
+        match(TokenType.CAR);
+        HeteroAST node = s_expr();
+        return new CarNode(new Token(TokenType.CDR, "cdr"), node);
+    }
+
     private HeteroAST gt() {
         match(TokenType.GT);
         HeteroAST left = s_expr();
