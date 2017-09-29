@@ -1,0 +1,4 @@
+(setq a (cons 1
+    (cons 2 3)))
+
+(print (car a))

@@ -8,10 +8,8 @@ import com.gossip.symtab.Scope;
 import com.gossip.symtab.Symbol;
 import com.gossip.symtab.SymbolTable;
 import com.gossip.util.Binder;
-import com.gossip.value.BoolValue;
-import com.gossip.value.IntValue;
-import com.gossip.value.StringValue;
-import com.gossip.value.Value;
+import com.gossip.value.*;
+import com.gossip.value.cons.Cons;
 
 import java.util.Stack;
 
@@ -44,6 +42,18 @@ public class EvalVisitor implements GossipVisitor {
         return Binder.<Integer>lift(Math::addExact).apply(
             addNode.getLeft().visit(this),
             addNode.getRight().visit(this));
+    }
+
+    private Value CONS(ConsNode consNode) {
+        Value leftVal = consNode.getLeft().visit(this);
+        Value rightVal = consNode.getRight().visit(this);
+        return new ConsValue(new Cons(leftVal, rightVal));
+    }
+
+    private Value CAR(CarNode node) {
+        Value val = node.getValue().visit(this);
+        ConsValue consValue = (ConsValue)val;
+        return consValue.getValue().getLeft();
     }
 
     private Value MINUS(MinusNode minusNode) {
@@ -205,10 +215,15 @@ public class EvalVisitor implements GossipVisitor {
             return CALL((CallNode)node);
         } else if (node instanceof CondNode) {
             return COND((CondNode)node);
+        } else if (node instanceof ConsNode) {
+            return CONS((ConsNode)node);
+        } else if (node instanceof CarNode) {
+            return CAR((CarNode)node);
         } else {
             throw new Error("未知节点");
         }
     }
+
 
 
 }

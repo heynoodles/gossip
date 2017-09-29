@@ -55,11 +55,11 @@ public class Interpreter {
     }
 
     public static void main(String[] args) {
-//        new Interpreter("tests/test2.gossip")
-//            .interp();
+        new Interpreter("tests/cons.gossip")
+            .interp();
 
-        Interpreter interpreter = new Interpreter();
-        interpreter.repl();
+//        Interpreter interpreter = new Interpreter();
+//        interpreter.repl();
     }
 
 }

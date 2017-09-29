@@ -71,6 +71,10 @@ public class GossipParser extends Parser {
             result = eq();
         } else if (LT(1).type == TokenType.COND) {
             result = cond();
+        } else if (LT(1).type == TokenType.CONS) {
+            result = cons();
+        } else if (LT(1).type == TokenType.CAR) {
+            result = car();
         } else if (LT(1).type == TokenType.NAME) {
             Symbol symbol = symbolTable.getSymbolWithName(LT(1).text);
             if (symbol != null && symbol instanceof MethodSymbol) {
@@ -112,6 +116,21 @@ public class GossipParser extends Parser {
             blocks.add(block);
         }
         return new CondNode(new Token(TokenType.COND, "cond"), blocks);
+    }
+
+    private HeteroAST cons() {
+        // (cons val1 val2)
+        match(TokenType.CONS);
+        HeteroAST left = s_expr();
+        HeteroAST right = s_expr();
+        return new ConsNode(new Token(TokenType.CONS, "cons"), left, right);
+    }
+
+    private HeteroAST car() {
+        // (car cons1)
+        match(TokenType.CAR);
+        HeteroAST node = s_expr();
+        return new CarNode(new Token(TokenType.CAR, "car"), node);
     }
 
     private HeteroAST gt() {

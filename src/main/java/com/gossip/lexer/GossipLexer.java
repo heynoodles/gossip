@@ -3,7 +3,6 @@ package com.gossip.lexer;
 
 /**
  * @author gaoxin.wei
- * LL(1)词法解析器
  */
 public class GossipLexer extends Lexer {
 
@@ -56,8 +55,14 @@ public class GossipLexer extends Lexer {
                         return INT();
                     } else if (isString()) {
                         return STRING();
+                    } else if (isCons()) {
+                        return CONS();
                     } else if (isPrint()) {
                         return PRINT();
+                    } else if (isCar()) {
+                        return CAR();
+                    } else if (isCdr()) {
+                        return CDR();
                     } else if (isSetq()) {
                         return SETQ();
                     } else if (isCond()) {
@@ -115,11 +120,44 @@ public class GossipLexer extends Lexer {
         return lookAhead("print");
     }
 
+    private boolean isCar() {
+        return lookAhead("car");
+    }
+
+    private boolean isCdr() {
+        return lookAhead("cdr");
+    }
+
+    private boolean isCons() {
+        return lookAhead("cons");
+    }
+
     private Token PRINT() {
         for (char c : "print".toCharArray()) {
             match(c);
         }
         return new Token(TokenType.PRINT, "print");
+    }
+
+    private Token CAR() {
+        for (char c : "car".toCharArray()) {
+            match(c);
+        }
+        return new Token(TokenType.CAR, "car");
+    }
+
+    private Token CDR() {
+        for (char c : "cdr".toCharArray()) {
+            match(c);
+        }
+        return new Token(TokenType.CDR, "cdr");
+    }
+
+    private Token CONS() {
+        for (char c : "cons".toCharArray()) {
+            match(c);
+        }
+        return new Token(TokenType.CONS, "cons");
     }
 
     private Token INT() {
