@@ -56,6 +56,12 @@ public class EvalVisitor implements GossipVisitor {
         return consValue.getValue().getLeft();
     }
 
+    private Value CDR(CdrNode node) {
+        Value val = node.getValue().visit(this);
+        ConsValue consValue = (ConsValue)val;
+        return consValue.getValue().getRight();
+    }
+
     private Value MINUS(MinusNode minusNode) {
         return Binder.<Integer>lift(Math::subtractExact).apply(
                 minusNode.getLeft().visit(this),
@@ -219,6 +225,8 @@ public class EvalVisitor implements GossipVisitor {
             return CONS((ConsNode)node);
         } else if (node instanceof CarNode) {
             return CAR((CarNode)node);
+        } else if (node instanceof CdrNode) {
+            return CDR((CdrNode)node);
         } else {
             throw new Error("未知节点");
         }

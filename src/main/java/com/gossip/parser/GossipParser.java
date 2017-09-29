@@ -75,6 +75,8 @@ public class GossipParser extends Parser {
             result = cons();
         } else if (LT(1).type == TokenType.CAR) {
             result = car();
+        } else if (LT(1).type == TokenType.CDR) {
+            result = cdr();
         } else if (LT(1).type == TokenType.NAME) {
             Symbol symbol = symbolTable.getSymbolWithName(LT(1).text);
             if (symbol != null && symbol instanceof MethodSymbol) {
@@ -135,9 +137,9 @@ public class GossipParser extends Parser {
 
     private HeteroAST cdr() {
         // (cdr cons1)
-        match(TokenType.CAR);
+        match(TokenType.CDR);
         HeteroAST node = s_expr();
-        return new CarNode(new Token(TokenType.CDR, "cdr"), node);
+        return new CdrNode(new Token(TokenType.CDR, "cdr"), node);
     }
 
     private HeteroAST gt() {
