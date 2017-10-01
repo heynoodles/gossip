@@ -9,9 +9,8 @@ import java.util.function.BiFunction;
  */
 public class Binder {
 
-    public static <T> BiFunction<Value<T>, Value<T>, Value<T>> lift(BiFunction<T, T, T> f) {
+    public static <L, R> BiFunction<Value<L>, Value<R>, Value<R>> lift(BiFunction<L, R, R> f) {
         return (left, right) -> left.flatMap(
-            leftVal -> right.map(rightVal -> f.apply(leftVal, rightVal)));
+                leftVal -> right.map(rightVal -> f.apply(leftVal, rightVal)));
     }
-
 }

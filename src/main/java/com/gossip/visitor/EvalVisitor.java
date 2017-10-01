@@ -43,9 +43,26 @@ public class EvalVisitor implements GossipVisitor {
     }
 
     private Value ADD(AddNode addNode) {
-        return Binder.<Integer>lift(Math::addExact).apply(
-            addNode.getLeft().visit(this),
-            addNode.getRight().visit(this));
+        Value left = addNode.getLeft().visit(this);
+        Value right = addNode.getRight().visit(this);
+
+        if (left instanceof IntValue && right instanceof IntValue) {
+            return Binder.<Integer, Integer>lift(Math::addExact).apply(left, right);
+        }
+
+        if (left instanceof FloatValue && right instanceof FloatValue) {
+            return Binder.<Double, Double>lift((v1, v2) -> v1 + v2).apply(left, right);
+        }
+
+        if (left instanceof IntValue && right instanceof FloatValue) {
+            return Binder.<Integer, Double>lift((v1, v2) -> v1 + v2).apply(left, right);
+        }
+
+        if (left instanceof FloatValue && right instanceof IntValue) {
+            return Binder.<Integer, Double>lift((v1, v2) -> v1 + v2).apply(right, left);
+        }
+
+        throw new Error("eval add node error");
     }
 
     private Value CONS(ConsNode consNode) {
@@ -67,9 +84,26 @@ public class EvalVisitor implements GossipVisitor {
     }
 
     private Value MINUS(MinusNode minusNode) {
-        return Binder.<Integer>lift(Math::subtractExact).apply(
-                minusNode.getLeft().visit(this),
-                minusNode.getRight().visit(this));
+        Value left = minusNode.getLeft().visit(this);
+        Value right = minusNode.getRight().visit(this);
+
+        if (left instanceof IntValue && right instanceof IntValue) {
+            return Binder.<Integer, Integer>lift(Math::subtractExact).apply(left, right);
+        }
+
+        if (left instanceof FloatValue && right instanceof FloatValue) {
+            return Binder.<Double, Double>lift((v1, v2) -> v1 - v2).apply(left, right);
+        }
+
+        if (left instanceof IntValue && right instanceof FloatValue) {
+            return Binder.<Integer, Double>lift((v1, v2) -> v1 - v2).apply(left, right);
+        }
+
+        if (left instanceof FloatValue && right instanceof IntValue) {
+            return Binder.<Integer, Double>lift((v1, v2) -> v1 - v2).apply(right, left);
+        }
+
+        throw new Error("eval minus node error");
     }
 
     private Value PRINT(PrintNode printNode) {

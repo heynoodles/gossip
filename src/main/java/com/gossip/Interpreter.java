@@ -70,7 +70,7 @@ public class Interpreter {
 //            new Interpreter().repl();
 //        }
 
-        new Interpreter("tests/fibonacci.gossip")
+        new Interpreter("tests/float.gossip")
             .interp();
 
     }
