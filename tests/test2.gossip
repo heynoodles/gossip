@@ -4,10 +4,10 @@
 (print step)
 
 -- function
-(defun add (a b c)
+(define (add a b c)
     (+ a (+ b c)))
 
-(defun increment (a)
+(define (increment a)
     (+ a step))
 
 (print

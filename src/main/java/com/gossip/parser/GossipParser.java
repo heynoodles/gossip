@@ -61,8 +61,8 @@ public class GossipParser extends Parser {
             result = print();
         } else if (LT(1).type == TokenType.SETQ) {
             result = setq();
-        } else if (LT(1).type == TokenType.DEFUN) {
-            defun();
+        } else if (LT(1).type == TokenType.DEFINE) {
+            define();
         } else if (LT(1).type == TokenType.GT) {
             result = gt();
         } else if (LT(1).type == TokenType.LT) {
@@ -160,12 +160,13 @@ public class GossipParser extends Parser {
         return new CallNode(root, params);
     }
 
-    private HeteroAST defun() {
-        // (defun funName (...params) body)
-        match(TokenType.DEFUN);
+    private HeteroAST define() {
+        // (define (funName ...params) body)
+        match(TokenType.DEFINE);
 
-        // parse funName
-        NameNode funName = (NameNode)s_expr();
+        NameNode funName = null;
+        match(TokenType.PAREN_BEGIN);
+        funName = (NameNode) s_expr();
 
         // build scope
         Scope previousScope = symbolTable.getCurrentScope();
@@ -175,7 +176,6 @@ public class GossipParser extends Parser {
 
         // parse params
         List<NameNode> params = new ArrayList<NameNode>();
-        match(TokenType.PAREN_BEGIN);
         while (LT(1).type != TokenType.PAREN_END) {
             params.add((NameNode) s_expr());
         }
@@ -185,7 +185,7 @@ public class GossipParser extends Parser {
         HeteroAST body = s_expr();
 
         FunctionNode functionNode = new FunctionNode(
-            new Token(TokenType.DEFUN, "defun"),
+            new Token(TokenType.DEFINE, "define"),
             funName,
             params,
             body

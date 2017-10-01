@@ -16,7 +16,7 @@ public class TokenType {
     public static int INT = 10;
     public static int PRINT = 11;
     public static int SETQ = 12;
-    public static int DEFUN = 13;
+    public static int DEFINE = 13;
     public static int GT = 14;
     public static int LT = 15;
     public static int EQ = 16;
@@ -28,6 +28,6 @@ public class TokenType {
 
     public static String[] tokenNames = {
         "n/a", "<EOF>", "NAME", "COMMA", "LBRACK", "RBRACK", "MINUS", "ADD", "PAREN_BEGIN", "PAREN_END", "INT",
-            "PRINT", "SETQ", "DEFUN", "GT", "LT", "EQ", "COND", "STRING_START", "CONS", "CAR", "CDR"
+            "PRINT", "SETQ", "DEFINE", "GT", "LT", "EQ", "COND", "STRING_START", "CONS", "CAR", "CDR"
     };
 }

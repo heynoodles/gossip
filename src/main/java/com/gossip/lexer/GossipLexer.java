@@ -67,8 +67,8 @@ public class GossipLexer extends Lexer {
                         return SETQ();
                     } else if (isCond()) {
                         return COND();
-                    } else if (isDefun()) {
-                        return DEFUN();
+                    } else if (isDefine()) {
+                        return DEFINE();
                     } else if (isLETTER()) {
                         return NAME();
                     } else {
@@ -216,15 +216,15 @@ public class GossipLexer extends Lexer {
         return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
     }
 
-    private boolean isDefun() {
-        return lookAhead("defun");
+    private boolean isDefine() {
+        return lookAhead("define");
     }
 
-    private Token DEFUN() {
-        for (char c : "defun".toCharArray()) {
+    private Token DEFINE() {
+        for (char c : "define".toCharArray()) {
             match(c);
         }
-        return new Token(TokenType.DEFUN, "defun");
+        return new Token(TokenType.DEFINE, "define");
     }
 
 }
