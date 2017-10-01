@@ -34,6 +34,10 @@ public class EvalVisitor implements GossipVisitor {
         return new IntValue(Integer.valueOf(node.getToken().text));
     }
 
+    private FloatValue FLOAT(FloatNode node) {
+        return new FloatValue(Double.valueOf(node.getToken().text));
+    }
+
     private StringValue STRING(StringNode node) {
         return new StringValue(node.getToken().text);
     }
@@ -217,6 +221,8 @@ public class EvalVisitor implements GossipVisitor {
             return MAIN((MainNode) node);
         } else if (node instanceof IntNode) {
            return INT((IntNode)node);
+        } else if (node instanceof FloatNode) {
+            return FLOAT((FloatNode)node);
         } else if (node instanceof StringNode) {
             return STRING((StringNode)node);
         } else if (node instanceof AddNode) {

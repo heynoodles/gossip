@@ -15,8 +15,9 @@ import java.util.List;
  * @author gaoxin.wei
  * 语法如下：
  * -------------------------------------------
- * s_expr : INT | STRING | NAME | list
+ * s_expr : list | atomic
  * list: '(' s_exp < s_exp > ')'
+ * atomic: INT | FLOAT | STRING | NAME
  *  ------------------------------------------
  */
 public class GossipParser extends Parser {
@@ -29,10 +30,22 @@ public class GossipParser extends Parser {
     }
 
     private HeteroAST s_expr() {
+        if (LT(1).type == TokenType.PAREN_BEGIN) {
+           return list();
+        } else {
+            return atomic();
+        }
+    }
+
+    private HeteroAST atomic() {
         if (LT(1).type == TokenType.INT) {
             HeteroAST intNode = new IntNode(LT(1));
             match(TokenType.INT);
             return intNode;
+        } else if (LT(1).type == TokenType.FLOAT) {
+            HeteroAST floatNode = new FloatNode(LT(1));
+            match(TokenType.FLOAT);
+            return floatNode;
         } else if (LT(1).type == TokenType.STRING) {
             HeteroAST strNode = new StringNode(LT(1));
             match(TokenType.STRING);
@@ -43,8 +56,6 @@ public class GossipParser extends Parser {
             symbolTable.getCurrentScope().define(new VariableSymbol(nameNode.getToken().text));
             match(TokenType.NAME);
             return nameNode;
-        } else if (LT(1).type == TokenType.PAREN_BEGIN) {
-           return list();
         } else
             throw new Error("parse element error");
     }

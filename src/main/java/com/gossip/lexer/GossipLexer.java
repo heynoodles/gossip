@@ -52,7 +52,7 @@ public class GossipLexer extends Lexer {
                     return new Token(TokenType.EQ, "=");
                 default:
                     if (isDigit()) {
-                        return INT();
+                        return NUMBER();
                     } else if (isString()) {
                         return STRING();
                     } else if (isCons()) {
@@ -162,17 +162,22 @@ public class GossipLexer extends Lexer {
         return new Token(TokenType.CONS, "cons");
     }
 
-    private Token INT() {
+    private Token NUMBER() {
         StringBuilder buf = new StringBuilder();
         do {
             buf.append(c);
             consume();
         } while (isDigit());
-        return new Token(TokenType.INT, buf.toString());
+        try {
+            Integer val = Integer.valueOf(buf.toString());
+            return new Token(TokenType.INT, buf.toString());
+        } catch (NumberFormatException e) {
+            return new Token(TokenType.FLOAT, buf.toString());
+        }
     }
 
-    boolean isDigit() {
-        return c >= '0' && c <= '9';
+    private boolean isDigit() {
+        return Character.isDigit(c) || c == '.' || c == '+' || c == '-';
     }
 
     private Token NAME() {

@@ -59,18 +59,19 @@ public class Interpreter {
         }
     }
 
+
     public static void main(String[] args) {
 
-        if (args.length > 0) {
-            String fileName = args[0];
-            new Interpreter(fileName)
-                .interp();
-        } else {
-            new Interpreter().repl();
-        }
+//        if (args.length > 0) {
+//            String fileName = args[0];
+//            new Interpreter(fileName)
+//                .interp();
+//        } else {
+//            new Interpreter().repl();
+//        }
 
-//        new Interpreter("tests/let.gossip")
-//            .interp();
+        new Interpreter("tests/fibonacci.gossip")
+            .interp();
 
     }
 

@@ -26,9 +26,10 @@ public class TokenType {
     public static int CAR = 20;
     public static int CDR = 21;
     public static int LET = 22;
+    public static int FLOAT = 23;
 
     public static String[] tokenNames = {
         "n/a", "<EOF>", "NAME", "COMMA", "LBRACK", "RBRACK", "MINUS", "ADD", "PAREN_BEGIN", "PAREN_END", "INT",
-            "PRINT", "SETQ", "DEFINE", "GT", "LT", "EQ", "COND", "STRING_START", "CONS", "CAR", "CDR", "LET"
+            "PRINT", "SETQ", "DEFINE", "GT", "LT", "EQ", "COND", "STRING_START", "CONS", "CAR", "CDR", "LET", "FLOAT"
     };
 }
