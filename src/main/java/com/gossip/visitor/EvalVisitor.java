@@ -23,7 +23,7 @@ public class EvalVisitor implements GossipVisitor {
 
     private SymbolTable symbolTable;
 
-    private Stack<FunctionSpace> stack = new Stack<FunctionSpace>();
+    private Stack<MemorySpace> stack = new Stack<MemorySpace>();
 
     public EvalVisitor(SymbolTable symbolTable, MemorySpace memorySpace) {
         this.globalSpace = memorySpace;
@@ -104,6 +104,24 @@ public class EvalVisitor implements GossipVisitor {
             throw new Error("cant resolve variable: " + text);
         }
         return memorySpace.get(text);
+    }
+
+    private Value LET(LetNode letNode) {
+        // (let binder block)
+        MemorySpace memorySpace = new MemorySpace("");
+        // prepare args in currentSpace
+        for (VarAndValNode varAndValNode : letNode.getParams()) {
+            memorySpace.put(varAndValNode.getVar().getToken().text, varAndValNode.getVal().visit(this));
+        }
+
+        // 设置currentSpace
+        stack.push(memorySpace);
+        Value result = letNode.getBody().visit(this);
+
+        // pop currentSpace
+        stack.push(memorySpace);
+
+        return result;
     }
 
     private Value CALL(CallNode callNode) {
@@ -227,6 +245,8 @@ public class EvalVisitor implements GossipVisitor {
             return CAR((CarNode)node);
         } else if (node instanceof CdrNode) {
             return CDR((CdrNode)node);
+        } else if (node instanceof LetNode) {
+            return LET((LetNode)node);
         } else {
             throw new Error("未知节点");
         }

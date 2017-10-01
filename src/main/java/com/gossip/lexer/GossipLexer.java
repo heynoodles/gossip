@@ -69,6 +69,8 @@ public class GossipLexer extends Lexer {
                         return COND();
                     } else if (isDefine()) {
                         return DEFINE();
+                    } else if (isLet()) {
+                        return LET();
                     } else if (isLETTER()) {
                         return NAME();
                     } else {
@@ -225,6 +227,17 @@ public class GossipLexer extends Lexer {
             match(c);
         }
         return new Token(TokenType.DEFINE, "define");
+    }
+
+    private boolean isLet() {
+        return lookAhead("let");
+    }
+
+    private Token LET() {
+        for (char c : "let".toCharArray()) {
+            match(c);
+        }
+        return new Token(TokenType.LET, "let");
     }
 
 }

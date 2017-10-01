@@ -77,6 +77,8 @@ public class GossipParser extends Parser {
             result = car();
         } else if (LT(1).type == TokenType.CDR) {
             result = cdr();
+        } else if (LT(1).type == TokenType.LET) {
+            result = let();
         } else if (LT(1).type == TokenType.NAME) {
             Symbol symbol = symbolTable.getSymbolWithName(LT(1).text);
             if (symbol != null && symbol instanceof MethodSymbol) {
@@ -158,6 +160,28 @@ public class GossipParser extends Parser {
             params.add(s_expr());
         }
         return new CallNode(root, params);
+    }
+
+    private HeteroAST let() {
+        // (let binder body)
+        match(TokenType.LET);
+
+        // parse  binder: ((var val))
+        List<VarAndValNode> params = new ArrayList<VarAndValNode>();
+        match(TokenType.PAREN_BEGIN);
+        while (LT(1).type != TokenType.PAREN_END) {
+            match(TokenType.PAREN_BEGIN);
+            NameNode var = (NameNode) s_expr();
+            HeteroAST val = s_expr();
+            params.add(new VarAndValNode(var, val));
+            match(TokenType.PAREN_END);
+        }
+        match(TokenType.PAREN_END);
+
+        // parse body
+        HeteroAST body = list();
+
+        return new LetNode(new Token(TokenType.LET, "let"), params, body);
     }
 
     private HeteroAST define() {
