@@ -47,19 +47,31 @@ public class Interpreter {
             String code = scanner.nextLine();
             if (":quit".equalsIgnoreCase(code)) {
                 return;
+            } else if (code.startsWith(":load")) {
+                String[] split = code.split("\\s+");
+                String fine = split[1];
+                this.fileContent = Util.readFile(fine);
+            } else {
+                this.fileContent = code;
             }
-            this.fileContent = code;
             System.out.println(interp());
             System.out.print("gossip> ");
         }
     }
 
     public static void main(String[] args) {
-        new Interpreter("tests/let.gossip")
-            .interp();
 
-//        Interpreter interpreter = new Interpreter();
-//        interpreter.repl();
+        if (args.length > 0) {
+            String fileName = args[0];
+            new Interpreter(fileName)
+                .interp();
+        } else {
+            new Interpreter().repl();
+        }
+
+//        new Interpreter("tests/let.gossip")
+//            .interp();
+
     }
 
 }
