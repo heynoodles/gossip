@@ -11,7 +11,7 @@ import com.gossip.util.Binder;
 import com.gossip.value.*;
 import com.gossip.value.cons.Cons;
 
-import java.util.Stack;
+import java.util.*;
 
 
 /**
@@ -23,7 +23,7 @@ public class EvalVisitor implements GossipVisitor {
 
     private SymbolTable symbolTable;
 
-    private Stack<MemorySpace> stack = new Stack<MemorySpace>();
+    private List<MemorySpace> stack = new ArrayList<>();
 
     public EvalVisitor(SymbolTable symbolTable, MemorySpace memorySpace) {
         this.globalSpace = memorySpace;
@@ -83,7 +83,7 @@ public class EvalVisitor implements GossipVisitor {
         return consValue.getValue().getRight();
     }
 
-    private Value MINUS(MinusNode minusNode) {
+    private Value SUBTRACT(SubtractNode minusNode) {
         Value left = minusNode.getLeft().visit(this);
         Value right = minusNode.getRight().visit(this);
 
@@ -103,7 +103,7 @@ public class EvalVisitor implements GossipVisitor {
             return Binder.<Integer, Double>lift((v1, v2) -> v1 - v2).apply(right, left);
         }
 
-        throw new Error("eval minus node error");
+        throw new Error("eval subtract node error");
     }
 
     private Value PRINT(PrintNode printNode) {
@@ -133,10 +133,6 @@ public class EvalVisitor implements GossipVisitor {
     private Value NAME(NameNode node) {
         // 变量
         String text = node.getToken().text;
-        Symbol symbol = symbolTable.getSymbolWithName(text);
-        if (symbol == null) {
-            throw new Error("cant resolve symbol: " + text);
-        }
         MemorySpace memorySpace = getCurrentSpaceWithName(text);
         if (memorySpace == null) {
             throw new Error("cant resolve variable: " + text);
@@ -153,11 +149,11 @@ public class EvalVisitor implements GossipVisitor {
         }
 
         // 设置currentSpace
-        stack.push(memorySpace);
+        stack.add(memorySpace);
         Value result = letNode.getBody().visit(this);
 
         // pop currentSpace
-        stack.push(memorySpace);
+        stack.remove(memorySpace);
 
         return result;
     }
@@ -187,13 +183,13 @@ public class EvalVisitor implements GossipVisitor {
         symbolTable.setCurrentScope(methodSymbol);
 
         // 设置currentSpace
-        stack.push(fs);
+        stack.add(fs);
 
         // call
         Value result = visit(functionNode.getBody());
 
         // pop currentSpace
-        stack.pop();
+        stack.remove(fs);
 
         // pop currentScope
         symbolTable.setCurrentScope(previousScope);
@@ -241,9 +237,15 @@ public class EvalVisitor implements GossipVisitor {
 
 
     private MemorySpace getCurrentSpaceWithName(String name) {
-        if (stack.size() > 0 && stack.peek().get(name) != null) {
-            return stack.peek();
+        if (stack.size() > 0) {
+            for (int i = stack.size() - 1; i >= 0; i--) {
+                MemorySpace memorySpace = stack.get(i);
+                if (memorySpace.get(name) != null) {
+                    return memorySpace;
+                }
+            }
         }
+
         if (globalSpace.get(name) != null) {
             return globalSpace;
         }
@@ -261,8 +263,8 @@ public class EvalVisitor implements GossipVisitor {
             return STRING((StringNode)node);
         } else if (node instanceof AddNode) {
             return ADD((AddNode)node);
-        } else if (node instanceof MinusNode) {
-            return MINUS((MinusNode)node);
+        } else if (node instanceof SubtractNode) {
+            return SUBTRACT((SubtractNode)node);
         } else if (node instanceof PrintNode) {
             return PRINT((PrintNode)node);
         } else if (node instanceof SetqNode) {

@@ -6,6 +6,7 @@ import com.gossip.lexer.Lexer;
 import com.gossip.lexer.Token;
 import com.gossip.lexer.TokenType;
 import com.gossip.symtab.*;
+import com.gossip.util.GossipException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +30,7 @@ public class GossipParser extends Parser {
         this.symbolTable = symbolTable;
     }
 
-    private HeteroAST s_expr() {
+    private HeteroAST s_expr() throws GossipException {
         if (LT(1).type == TokenType.PAREN_BEGIN) {
            return list();
         } else {
@@ -37,37 +38,52 @@ public class GossipParser extends Parser {
         }
     }
 
-    private HeteroAST atomic() {
+    private HeteroAST atomic() throws GossipException {
         if (LT(1).type == TokenType.INT) {
-            HeteroAST intNode = new IntNode(LT(1));
-            match(TokenType.INT);
-            return intNode;
+            return _int();
         } else if (LT(1).type == TokenType.FLOAT) {
-            HeteroAST floatNode = new FloatNode(LT(1));
-            match(TokenType.FLOAT);
-            return floatNode;
+            return _float();
         } else if (LT(1).type == TokenType.STRING) {
-            HeteroAST strNode = new StringNode(LT(1));
-            match(TokenType.STRING);
-            return strNode;
+            return _string();
         } else if (LT(1).type == TokenType.NAME) {
-            // 变量
-            HeteroAST nameNode = new NameNode(LT(1));
-            symbolTable.getCurrentScope().define(new VariableSymbol(nameNode.getToken().text));
-            match(TokenType.NAME);
-            return nameNode;
+            return name();
         } else
-            throw new Error("parse element error");
+            throw new GossipException("parse element error");
     }
 
-    private HeteroAST list() {
+    private HeteroAST name() {
+        HeteroAST nameNode = new NameNode(LT(1));
+        match(TokenType.NAME);
+        return nameNode;
+    }
+
+    private HeteroAST _string() {
+        HeteroAST strNode = new StringNode(LT(1));
+        match(TokenType.STRING);
+        return strNode;
+    }
+
+    private HeteroAST _float() {
+        HeteroAST floatNode = new FloatNode(LT(1));
+        match(TokenType.FLOAT);
+        return floatNode;
+    }
+
+    private HeteroAST _int() {
+        HeteroAST intNode = new IntNode(LT(1));
+        match(TokenType.INT);
+        return intNode;
+    }
+
+
+    private HeteroAST list() throws GossipException {
         HeteroAST result = null;
 
         match(TokenType.PAREN_BEGIN);
         if (LT(1).type == TokenType.ADD) {
             result = add();
-        } else if (LT(1).type == TokenType.MINUS) {
-            result = minus();
+        } else if (LT(1).type == TokenType.SUBTRACT) {
+            result = subtract();
         } else if (LT(1).type == TokenType.PRINT) {
             result = print();
         } else if (LT(1).type == TokenType.SETQ) {
@@ -96,28 +112,28 @@ public class GossipParser extends Parser {
                 result = call();
             }
         } else {
-            throw new Error("parse element error");
+            throw new GossipException("parse element error");
         }
         match(TokenType.PAREN_END);
 
         return result;
     }
 
-    private HeteroAST lt() {
+    private HeteroAST lt() throws GossipException {
         match(TokenType.LT);
         HeteroAST left = s_expr();
         HeteroAST right = s_expr();
         return new LTNode(new Token(TokenType.LT, "<"), left, right);
     }
 
-    private HeteroAST eq() {
+    private HeteroAST eq() throws GossipException {
         match(TokenType.EQ);
         HeteroAST left = s_expr();
         HeteroAST right = s_expr();
         return new EQNode(new Token(TokenType.EQ, "="), left, right);
     }
 
-    private HeteroAST cond() {
+    private HeteroAST cond() throws GossipException {
         // (cond (pred1 exec1)
         //       (pred2 exec2))
         match(TokenType.COND);
@@ -133,7 +149,7 @@ public class GossipParser extends Parser {
         return new CondNode(new Token(TokenType.COND, "cond"), blocks);
     }
 
-    private HeteroAST cons() {
+    private HeteroAST cons() throws GossipException {
         // (cons val1 val2)
         match(TokenType.CONS);
         HeteroAST left = s_expr();
@@ -141,28 +157,28 @@ public class GossipParser extends Parser {
         return new ConsNode(new Token(TokenType.CONS, "cons"), left, right);
     }
 
-    private HeteroAST car() {
+    private HeteroAST car() throws GossipException {
         // (car cons1)
         match(TokenType.CAR);
         HeteroAST node = s_expr();
         return new CarNode(new Token(TokenType.CAR, "car"), node);
     }
 
-    private HeteroAST cdr() {
+    private HeteroAST cdr() throws GossipException {
         // (cdr cons1)
         match(TokenType.CDR);
         HeteroAST node = s_expr();
         return new CdrNode(new Token(TokenType.CDR, "cdr"), node);
     }
 
-    private HeteroAST gt() {
+    private HeteroAST gt() throws GossipException {
         match(TokenType.GT);
         HeteroAST left = s_expr();
         HeteroAST right = s_expr();
         return new GTNode(new Token(TokenType.GT, ">"), left, right);
     }
 
-    private HeteroAST call() {
+    private HeteroAST call() throws GossipException {
         Token root = LT(1);
         consume();
         // (fun p1 p2 ...)
@@ -173,7 +189,7 @@ public class GossipParser extends Parser {
         return new CallNode(root, params);
     }
 
-    private HeteroAST let() {
+    private HeteroAST let() throws GossipException {
         // (let binder body)
         match(TokenType.LET);
 
@@ -195,7 +211,7 @@ public class GossipParser extends Parser {
         return new LetNode(new Token(TokenType.LET, "let"), params, body);
     }
 
-    private HeteroAST define() {
+    private HeteroAST define() throws GossipException {
         // (define (funName ...params) body)
         match(TokenType.DEFINE);
 
@@ -212,7 +228,9 @@ public class GossipParser extends Parser {
         // parse params
         List<NameNode> params = new ArrayList<NameNode>();
         while (LT(1).type != TokenType.PAREN_END) {
-            params.add((NameNode) s_expr());
+            NameNode name = (NameNode) s_expr();
+            params.add(name);
+            symbolTable.getCurrentScope().define(new VariableSymbol(name.getToken().text));
         }
         match(TokenType.PAREN_END);
 
@@ -232,35 +250,36 @@ public class GossipParser extends Parser {
         return null;
     }
 
-    private HeteroAST setq() {
+    private HeteroAST setq() throws GossipException {
         match(TokenType.SETQ);
         NameNode name = (NameNode) s_expr();
+        symbolTable.getCurrentScope().define(new VariableSymbol(name.getToken().text));
         HeteroAST valNode = s_expr();
         return new SetqNode(new Token(TokenType.SETQ, "setq"), name, valNode);
     }
 
-    private HeteroAST print() {
+    private HeteroAST print() throws GossipException {
         match(TokenType.PRINT);
         HeteroAST param = s_expr();
         return new PrintNode(new Token(TokenType.PRINT, "print"), param);
     }
 
-    private HeteroAST add() {
+    private HeteroAST add() throws GossipException {
         match(TokenType.ADD);
         HeteroAST left = s_expr();
         HeteroAST right = s_expr();
         return new AddNode(new Token(TokenType.ADD, "+"), left, right);
     }
 
-    private HeteroAST minus() {
-        match(TokenType.MINUS);
+    private HeteroAST subtract() throws GossipException {
+        match(TokenType.SUBTRACT);
         HeteroAST left = s_expr();
         HeteroAST right = s_expr();
-        return new MinusNode(new Token(TokenType.MINUS, "-"), left, right);
+        return new SubtractNode(new Token(TokenType.SUBTRACT, "-"), left, right);
     }
 
     // 入口
-    public HeteroAST parse() {
+    public HeteroAST parse() throws GossipException {
         MainNode mainNode = new MainNode();
         while (LT(1) != null && !LT(1).equals(Token.EOF)) {
             HeteroAST heteroAST = s_expr();

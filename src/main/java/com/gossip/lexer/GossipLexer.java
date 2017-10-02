@@ -40,7 +40,7 @@ public class GossipLexer extends Lexer {
                     return new Token(TokenType.ADD, "+");
                 case '-':
                     consume();
-                    return new Token(TokenType.MINUS, "-");
+                    return new Token(TokenType.SUBTRACT, "-");
                 case '>':
                     consume();
                     return new Token(TokenType.GT, ">");

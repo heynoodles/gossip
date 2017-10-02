@@ -5,6 +5,7 @@ import com.gossip.lexer.GossipLexer;
 import com.gossip.memory.MemorySpace;
 import com.gossip.parser.GossipParser;
 import com.gossip.symtab.SymbolTable;
+import com.gossip.util.GossipException;
 import com.gossip.util.Util;
 import com.gossip.value.Value;
 import com.gossip.visitor.EvalVisitor;
@@ -28,14 +29,14 @@ public class Interpreter {
 
     public Interpreter() {}
 
-    public Value interp() {
+    public Value interp() throws GossipException {
         GossipLexer lexer = new GossipLexer(fileContent);
         GossipParser parser = new GossipParser(lexer, 2, symbolTable);
         HeteroAST expr = parser.parse();
         return expr.visit(new EvalVisitor(symbolTable, memorySpace));
     }
 
-    public void repl() {
+    public void repl() throws GossipException {
         System.out.println("Welcome to Gossip REPL v1.0");
         System.out.println("see: https://github.com/heynoodles/gossip");
         System.out.println("");
@@ -60,7 +61,7 @@ public class Interpreter {
     }
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws GossipException {
 
 //        if (args.length > 0) {
 //            String fileName = args[0];
@@ -70,7 +71,7 @@ public class Interpreter {
 //            new Interpreter().repl();
 //        }
 
-        new Interpreter("tests/float.gossip")
+        new Interpreter("tests/let.gossip")
             .interp();
 
     }
