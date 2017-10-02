@@ -1,0 +1,14 @@
+-- (lambda (param) (body))
+
+(define a
+    (lambda (x) (+ x 1)))
+
+(print (a 1))
+
+(define (compose f g x)
+    (f (g x)))
+
+(define (add x) (+ x 1))
+
+(print
+    (compose add add 1))

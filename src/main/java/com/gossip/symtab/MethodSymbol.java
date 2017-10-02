@@ -1,16 +1,17 @@
 package com.gossip.symtab;
 
 import com.gossip.ast.FunctionNode;
+import com.sun.org.apache.xalan.internal.xsltc.compiler.sym;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * @author gaoxin.wei
  */
 public class MethodSymbol extends Symbol implements Scope {
 
-    private List<Symbol> orderedArgs = new ArrayList<Symbol>();
+    private Map<String, Symbol> orderedArgs = new LinkedHashMap();
 
     private Scope enclosingScope;
 
@@ -41,16 +42,16 @@ public class MethodSymbol extends Symbol implements Scope {
 
     @Override
     public void define(Symbol sym) {
-        orderedArgs.add(sym);
+        orderedArgs.put(sym.getName(), sym);
+    }
+
+    @Override
+    public void define(String name, Symbol symbol) {
+        orderedArgs.put(name, symbol);
     }
 
     @Override
     public Symbol resolve(String name) {
-        for (Symbol orderedArg : orderedArgs) {
-            if (name.equalsIgnoreCase(orderedArg.getName())) {
-                return orderedArg;
-            }
-        }
-        return null;
+       return orderedArgs.get(name);
     }
 }

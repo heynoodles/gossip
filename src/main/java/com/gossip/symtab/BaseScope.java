@@ -1,5 +1,7 @@
 package com.gossip.symtab;
 
+import com.sun.org.apache.xalan.internal.xsltc.compiler.sym;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,6 +31,11 @@ public class BaseScope implements Scope {
 
     public void define(Symbol sym) {
         symbols.put(sym.getName(), sym);
+    }
+
+    @Override
+    public void define(String name, Symbol symbol) {
+        symbols.put(name, symbol);
     }
 
     public Symbol resolve(String name) {

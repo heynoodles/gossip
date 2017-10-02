@@ -131,13 +131,20 @@ public class EvalVisitor implements GossipVisitor {
     }
 
     private Value NAME(NameNode node) {
-        // 变量
         String text = node.getToken().text;
         MemorySpace memorySpace = getCurrentSpaceWithName(text);
-        if (memorySpace == null) {
-            throw new Error("cant resolve variable: " + text);
+        if (memorySpace != null) {
+            // 变量
+            return memorySpace.get(text);
+        } else {
+            Symbol resolve = symbolTable.getCurrentScope().resolve(text);
+            if (resolve != null) {
+                // 方法
+                return new FuncValue(resolve.getName());
+            } else
+                throw new Error("cant resolve variable: " + text);
         }
-        return memorySpace.get(text);
+
     }
 
     private Value LET(LetNode letNode) {
@@ -174,7 +181,13 @@ public class EvalVisitor implements GossipVisitor {
             NameNode nameNode = functionNode.getParams().get(i);
             if (i < callNode.getParams().size()) {
                 HeteroAST paramNode = callNode.getParams().get(i);
-                fs.put(nameNode.getToken().text, visit(paramNode));
+                Value val = visit(paramNode);
+                fs.put(nameNode.getToken().text, val);
+                if (val instanceof FuncValue) {
+                    // 动态绑定为function
+                    methodSymbol.define(nameNode.getToken().text,
+                        symbolTable.getSymbolWithName(paramNode.getToken().text));
+                }
             }
         }
 

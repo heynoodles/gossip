@@ -75,7 +75,6 @@ public class GossipParser extends Parser {
         return intNode;
     }
 
-
     private HeteroAST list() throws GossipException {
         HeteroAST result = null;
 
@@ -106,11 +105,15 @@ public class GossipParser extends Parser {
             result = cdr();
         } else if (LT(1).type == TokenType.LET) {
             result = let();
-        } else if (LT(1).type == TokenType.NAME) {
+        } else if (LT(1).type == TokenType.LAMBDA) {
+            result = lambda();
+        }  else if (LT(1).type == TokenType.NAME) {
             Symbol symbol = symbolTable.getSymbolWithName(LT(1).text);
-            if (symbol != null && symbol instanceof MethodSymbol) {
+            if (symbol != null) {
                 result = call();
             }
+        } else if (LT(1).type == TokenType.PAREN_BEGIN) {
+            result = list();
         } else {
             throw new GossipException("parse element error");
         }
@@ -189,6 +192,34 @@ public class GossipParser extends Parser {
         return new CallNode(root, params);
     }
 
+    private HeteroAST lambda() throws GossipException {
+        Scope previousScope = symbolTable.getCurrentScope();
+
+        // (lambda (...params) body)
+        match(TokenType.LAMBDA);
+        match(TokenType.PAREN_BEGIN);
+        List<NameNode> params = new ArrayList<NameNode>();
+        // parse params
+        while (LT(1).type != TokenType.PAREN_END) {
+            NameNode name = (NameNode) s_expr();
+            params.add(name);
+            symbolTable.getCurrentScope().define(new VariableSymbol(name.getToken().text));
+        }
+        match(TokenType.PAREN_END);
+
+        HeteroAST body = s_expr();
+
+        FunctionNode functionNode = new FunctionNode(
+            new Token(TokenType.DEFINE, "define"),
+            new NameNode(new Token(TokenType.LAMBDA, "lambda")),
+            params,
+            body
+        );
+        symbolTable.setCurrentScope(previousScope);
+
+        return functionNode;
+    }
+
     private HeteroAST let() throws GossipException {
         // (let binder body)
         match(TokenType.LET);
@@ -212,30 +243,57 @@ public class GossipParser extends Parser {
     }
 
     private HeteroAST define() throws GossipException {
-        // (define (funName ...params) body)
         match(TokenType.DEFINE);
 
-        NameNode funName = null;
-        match(TokenType.PAREN_BEGIN);
-        funName = (NameNode) s_expr();
-
-        // build scope
         Scope previousScope = symbolTable.getCurrentScope();
-        MethodSymbol methodSymbol = new MethodSymbol(funName.getToken().text, previousScope);
-        previousScope.define(methodSymbol);
-        symbolTable.setCurrentScope(methodSymbol);
-
-        // parse params
+        NameNode funName = null;
+        MethodSymbol methodSymbol = null;
+        HeteroAST body = null;
         List<NameNode> params = new ArrayList<NameNode>();
-        while (LT(1).type != TokenType.PAREN_END) {
-            NameNode name = (NameNode) s_expr();
-            params.add(name);
-            symbolTable.getCurrentScope().define(new VariableSymbol(name.getToken().text));
-        }
-        match(TokenType.PAREN_END);
 
-        // parse body
-        HeteroAST body = s_expr();
+        if (LT(1).type == TokenType.PAREN_BEGIN) {
+            // case 1: (define (funName ...params) body)
+            match(TokenType.PAREN_BEGIN);
+            funName = (NameNode) s_expr();
+
+            // build scope
+            methodSymbol = new MethodSymbol(funName.getToken().text, previousScope);
+            previousScope.define(methodSymbol);
+            symbolTable.setCurrentScope(methodSymbol);
+
+            // parse params
+            while (LT(1).type != TokenType.PAREN_END) {
+                NameNode name = (NameNode) s_expr();
+                params.add(name);
+                symbolTable.getCurrentScope().define(new VariableSymbol(name.getToken().text));
+            }
+            match(TokenType.PAREN_END);
+            // parse body
+            body = s_expr();
+        } else {
+            // case 2: (define funName (lambda (...params) body))
+            funName = (NameNode) s_expr();
+
+            // build scope
+            methodSymbol = new MethodSymbol(funName.getToken().text, previousScope);
+            previousScope.define(methodSymbol);
+            symbolTable.setCurrentScope(methodSymbol);
+
+            match(TokenType.PAREN_BEGIN);
+            match(TokenType.LAMBDA);
+
+            match(TokenType.PAREN_BEGIN);
+            // parse params
+            while (LT(1).type != TokenType.PAREN_END) {
+                NameNode name = (NameNode) s_expr();
+                params.add(name);
+                symbolTable.getCurrentScope().define(new VariableSymbol(name.getToken().text));
+            }
+            match(TokenType.PAREN_END);
+            // parse body
+            body = s_expr();
+            match(TokenType.PAREN_END);
+        }
 
         FunctionNode functionNode = new FunctionNode(
             new Token(TokenType.DEFINE, "define"),

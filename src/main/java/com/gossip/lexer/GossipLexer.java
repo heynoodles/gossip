@@ -71,6 +71,8 @@ public class GossipLexer extends Lexer {
                         return DEFINE();
                     } else if (isLet()) {
                         return LET();
+                    } else if (isLambda()) {
+                        return LAMBDA();
                     } else if (isLETTER()) {
                         return NAME();
                     } else {
@@ -215,12 +217,9 @@ public class GossipLexer extends Lexer {
         return TokenType.tokenNames[tokenType];
     }
 
-    boolean isLetterOrDigit() {
-        return isLETTER() || isDigit();
-    }
 
     boolean isLETTER() {
-        return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+        return Character.isLetterOrDigit(c);
     }
 
     private boolean isDefine() {
@@ -243,6 +242,18 @@ public class GossipLexer extends Lexer {
             match(c);
         }
         return new Token(TokenType.LET, "let");
+    }
+
+
+    private boolean isLambda() {
+        return lookAhead("lambda");
+    }
+
+    private Token LAMBDA() {
+        for (char c : "lambda".toCharArray()) {
+            match(c);
+        }
+        return new Token(TokenType.LAMBDA, "lambda");
     }
 
 }

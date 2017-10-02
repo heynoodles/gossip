@@ -1,0 +1,6 @@
+-- todo (lambda (param) (body))
+
+(define (compose2 f g)
+    (lambda (x) (f x)))
+
+((compose2 add add) 2)
