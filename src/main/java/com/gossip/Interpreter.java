@@ -71,7 +71,7 @@ public class Interpreter {
 //            new Interpreter().repl();
 //        }
 
-        new Interpreter("tests/lambda.gossip")
+        new Interpreter("tests/lambda1.gossip")
             .interp();
 
     }

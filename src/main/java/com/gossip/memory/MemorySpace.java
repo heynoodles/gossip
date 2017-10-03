@@ -16,6 +16,14 @@ public class MemorySpace {
 
     private MemorySpace() {}
 
+    public Map<String, Value> getMembers() {
+        return members;
+    }
+
+    public void setMembers(Map<String, Value> members) {
+        this.members = members;
+    }
+
     public MemorySpace(String name) {
         this.name = name;
     }

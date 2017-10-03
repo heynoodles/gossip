@@ -107,15 +107,11 @@ public class GossipParser extends Parser {
             result = let();
         } else if (LT(1).type == TokenType.LAMBDA) {
             result = lambda();
-        }  else if (LT(1).type == TokenType.NAME) {
-            Symbol symbol = symbolTable.getSymbolWithName(LT(1).text);
-            if (symbol != null) {
-                result = call();
-            }
-        } else if (LT(1).type == TokenType.PAREN_BEGIN) {
-            result = list();
         } else {
-            throw new GossipException("parse element error");
+            // Symbol symbol = symbolTable.getSymbolWithName(LT(1).text);
+            // if (symbol != null) {
+            result = call();
+            //}
         }
         match(TokenType.PAREN_END);
 
@@ -182,18 +178,19 @@ public class GossipParser extends Parser {
     }
 
     private HeteroAST call() throws GossipException {
-        Token root = LT(1);
-        consume();
+        // Token root = LT(1);
+        HeteroAST operator = s_expr();
+        // consume();
         // (fun p1 p2 ...)
         List<HeteroAST> params = new ArrayList<HeteroAST>();
         while (LT(1).type != TokenType.PAREN_END) {
             params.add(s_expr());
         }
-        return new CallNode(root, params);
+        return new CallNode(operator, params);
     }
 
     private HeteroAST lambda() throws GossipException {
-        Scope previousScope = symbolTable.getCurrentScope();
+        // Scope previousScope = symbolTable.getCurrentScope();
 
         // (lambda (...params) body)
         match(TokenType.LAMBDA);
@@ -215,7 +212,7 @@ public class GossipParser extends Parser {
             params,
             body
         );
-        symbolTable.setCurrentScope(previousScope);
+        // symbolTable.setCurrentScope(previousScope);
 
         return functionNode;
     }
@@ -265,7 +262,7 @@ public class GossipParser extends Parser {
             while (LT(1).type != TokenType.PAREN_END) {
                 NameNode name = (NameNode) s_expr();
                 params.add(name);
-                symbolTable.getCurrentScope().define(new VariableSymbol(name.getToken().text));
+                symbolTable.getCurrentScope().define(new Symbol(name.getToken().text));
             }
             match(TokenType.PAREN_END);
             // parse body
@@ -287,7 +284,7 @@ public class GossipParser extends Parser {
             while (LT(1).type != TokenType.PAREN_END) {
                 NameNode name = (NameNode) s_expr();
                 params.add(name);
-                symbolTable.getCurrentScope().define(new VariableSymbol(name.getToken().text));
+                symbolTable.getCurrentScope().define(new Symbol(name.getToken().text));
             }
             match(TokenType.PAREN_END);
             // parse body

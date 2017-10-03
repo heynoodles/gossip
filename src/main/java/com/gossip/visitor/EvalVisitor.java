@@ -165,16 +165,37 @@ public class EvalVisitor implements GossipVisitor {
         return result;
     }
 
+    private Value FUNCTION(FunctionNode node) {
+        FuncValue funcValue = new FuncValue("lambda");
+        MethodSymbol methodSymbol = new MethodSymbol("lambda", symbolTable.getCurrentScope());
+        methodSymbol.setFunctionNode(node);
+        funcValue.setScope(methodSymbol);
+        return funcValue;
+    }
+
     private Value CALL(CallNode callNode) {
         // 获取functionNode
-        String funcName = callNode.getToken().text;
-        Symbol symbol = symbolTable.getSymbolWithName(funcName);
-        if (symbol == null) {
-            throw new Error("unsupported symbol type");
+        // String funcName = callNode.getToken().text;
+        FunctionNode functionNode = null;
+        FunctionSpace fs = null;
+        MethodSymbol methodSymbol = null;
+        HeteroAST operator = callNode.getOperator();
+
+        if (operator instanceof NameNode) {
+            String funcName = operator.getToken().text;
+            Symbol symbol = symbolTable.getSymbolWithName(funcName);
+            if (symbol == null) {
+                throw new Error("unsupported symbol type");
+            }
+            methodSymbol = (MethodSymbol) symbol;
+            fs = new FunctionSpace(funcName, methodSymbol.getFunctionNode());
+        } else if (operator instanceof CallNode) {
+            Value val = CALL((CallNode) operator);
+            FuncValue funcValue = (FuncValue)val;
+            methodSymbol = funcValue.getScope();
+            fs = new FunctionSpace("lambda", methodSymbol.getFunctionNode());
         }
-        MethodSymbol methodSymbol = (MethodSymbol) symbol;
-        FunctionNode functionNode = methodSymbol.getFunctionNode();
-        FunctionSpace fs = new FunctionSpace(funcName, functionNode);
+        functionNode = fs.getFunctionNode();
 
         // prepare args in currentSpace
         for (int i = 0; i < functionNode.getParams().size(); i++) {
@@ -302,6 +323,8 @@ public class EvalVisitor implements GossipVisitor {
             return CDR((CdrNode)node);
         } else if (node instanceof LetNode) {
             return LET((LetNode)node);
+        } else if (node instanceof FunctionNode) {
+            return FUNCTION((FunctionNode)node);
         } else {
             throw new Error("未知节点");
         }
