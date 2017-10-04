@@ -1,17 +1,17 @@
 package com.gossip.symtab;
 
+import com.gossip.value.Value;
+
 /**
  * @author gaoxin.wei
  */
 public interface Scope {
 
-    public String getScopeName();
+    String getScopeName();
 
-    public Scope getEnclosingScope();
+    Scope getEnclosingScope();
 
-    public void define(Symbol sym);
+    void define(String name, Value symbol);
 
-    public void define(String name, Symbol symbol);
-
-    public Symbol resolve(String name);
+    Value resolve(String name);
 }

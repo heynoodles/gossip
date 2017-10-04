@@ -1,5 +1,7 @@
 package com.gossip.symtab;
 
+import com.gossip.value.Value;
+
 /**
  * @author gaoxin.wei
  */
@@ -9,14 +11,14 @@ public class SymbolTable {
 
     private Scope currentScope = globalScope;
 
-    public Symbol getSymbolWithName(String name) {
-        Symbol resolve = this.currentScope.resolve(name);
+    public Value getSymbolWithName(String name) {
+        Value resolve = this.currentScope.resolve(name);
         if (resolve != null) {
             return resolve;
         }
-        for (Scope currentScope = this.currentScope; currentScope.getEnclosingScope() != null;
-             currentScope = currentScope.getEnclosingScope()) {
-            Symbol resolve1 = currentScope.getEnclosingScope().resolve(name);
+        for (Scope currentScope1 = this.currentScope; currentScope1.getEnclosingScope() != null;
+             currentScope1 = currentScope1.getEnclosingScope()) {
+            Value resolve1 = currentScope1.getEnclosingScope().resolve(name);
             if (resolve1 != null) {
                 return resolve1;
             }

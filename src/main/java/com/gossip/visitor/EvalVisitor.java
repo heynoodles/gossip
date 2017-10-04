@@ -1,17 +1,10 @@
 package com.gossip.visitor;
 
 import com.gossip.ast.*;
-import com.gossip.memory.FunctionSpace;
-import com.gossip.memory.MemorySpace;
-import com.gossip.symtab.MethodSymbol;
-import com.gossip.symtab.Scope;
-import com.gossip.symtab.Symbol;
-import com.gossip.symtab.SymbolTable;
+import com.gossip.symtab.*;
 import com.gossip.util.Binder;
 import com.gossip.value.*;
 import com.gossip.value.cons.Cons;
-
-import java.util.*;
 
 
 /**
@@ -19,14 +12,9 @@ import java.util.*;
  */
 public class EvalVisitor implements GossipVisitor {
 
-    private MemorySpace globalSpace;
-
     private SymbolTable symbolTable;
 
-    private List<MemorySpace> stack = new ArrayList<>();
-
-    public EvalVisitor(SymbolTable symbolTable, MemorySpace memorySpace) {
-        this.globalSpace = memorySpace;
+    public EvalVisitor(SymbolTable symbolTable) {
         this.symbolTable = symbolTable;
     }
 
@@ -126,76 +114,66 @@ public class EvalVisitor implements GossipVisitor {
         if (symbolTable.globalScope.resolve(var.getToken().text) == null) {
             throw new Error("cant resolve symbol: " + var.getToken().text);
         }
-        globalSpace.put(var.getToken().text, val);
+        symbolTable.globalScope.define(var.getToken().text, val);
         return Value.VOID;
     }
 
     private Value NAME(NameNode node) {
         String text = node.getToken().text;
-        MemorySpace memorySpace = getCurrentSpaceWithName(text);
-        if (memorySpace != null) {
-            // 变量
-            return memorySpace.get(text);
-        } else {
-            Symbol resolve = symbolTable.getCurrentScope().resolve(text);
-            if (resolve != null) {
-                // 方法
-                return new FuncValue(resolve.getName());
-            } else
-                throw new Error("cant resolve variable: " + text);
-        }
-
+        return symbolTable.getSymbolWithName(text);
     }
 
     private Value LET(LetNode letNode) {
+
+        Scope previousScope = symbolTable.getCurrentScope();
+
         // (let binder block)
-        MemorySpace memorySpace = new MemorySpace("");
+        CallScope callScope = new CallScope("", symbolTable.getCurrentScope());
         // prepare args in currentSpace
         for (VarAndValNode varAndValNode : letNode.getParams()) {
-            memorySpace.put(varAndValNode.getVar().getToken().text, varAndValNode.getVal().visit(this));
+            callScope.define(varAndValNode.getVar().getToken().text, varAndValNode.getVal().visit(this));
         }
 
         // 设置currentSpace
-        stack.add(memorySpace);
+        symbolTable.setCurrentScope(callScope);
+
         Value result = letNode.getBody().visit(this);
 
         // pop currentSpace
-        stack.remove(memorySpace);
+        symbolTable.setCurrentScope(previousScope);
 
         return result;
     }
 
     private Value FUNCTION(FunctionNode node) {
         FuncValue funcValue = new FuncValue("lambda");
-        MethodSymbol methodSymbol = new MethodSymbol("lambda", symbolTable.getCurrentScope());
-        methodSymbol.setFunctionNode(node);
-        funcValue.setScope(methodSymbol);
+        ClosureScope closure = new ClosureScope("lambda", symbolTable.getCurrentScope());
+        closure.setFunctionNode(node);
+        funcValue.setScope(closure);
         return funcValue;
     }
 
     private Value CALL(CallNode callNode) {
         // 获取functionNode
-        // String funcName = callNode.getToken().text;
-        FunctionNode functionNode = null;
-        FunctionSpace fs = null;
-        MethodSymbol methodSymbol = null;
-        HeteroAST operator = callNode.getOperator();
 
+        HeteroAST operator = callNode.getOperator();
+        MethodSymbol methodSymbol = null;
+        CallScope callScope = null;
+        FunctionNode functionNode = null;
         if (operator instanceof NameNode) {
             String funcName = operator.getToken().text;
-            Symbol symbol = symbolTable.getSymbolWithName(funcName);
-            if (symbol == null) {
+            methodSymbol = (MethodSymbol) symbolTable.getSymbolWithName(funcName);
+            if (methodSymbol == null) {
                 throw new Error("unsupported symbol type");
             }
-            methodSymbol = (MethodSymbol) symbol;
-            fs = new FunctionSpace(funcName, methodSymbol.getFunctionNode());
+            callScope = new CallScope(funcName, symbolTable.getCurrentScope());
+            functionNode = methodSymbol.getFunctionNode();
         } else if (operator instanceof CallNode) {
             Value val = CALL((CallNode) operator);
             FuncValue funcValue = (FuncValue)val;
-            methodSymbol = funcValue.getScope();
-            fs = new FunctionSpace("lambda", methodSymbol.getFunctionNode());
+            callScope = funcValue.getScope();
+            functionNode = ((ClosureScope)callScope).getFunctionNode();
         }
-        functionNode = fs.getFunctionNode();
 
         // prepare args in currentSpace
         for (int i = 0; i < functionNode.getParams().size(); i++) {
@@ -203,27 +181,16 @@ public class EvalVisitor implements GossipVisitor {
             if (i < callNode.getParams().size()) {
                 HeteroAST paramNode = callNode.getParams().get(i);
                 Value val = visit(paramNode);
-                fs.put(nameNode.getToken().text, val);
-                if (val instanceof FuncValue) {
-                    // 动态绑定为function
-                    methodSymbol.define(nameNode.getToken().text,
-                        symbolTable.getSymbolWithName(paramNode.getToken().text));
-                }
+                callScope.define(nameNode.getToken().text, val);
             }
         }
 
         // 设置currentScope
         Scope previousScope = symbolTable.getCurrentScope();
-        symbolTable.setCurrentScope(methodSymbol);
-
-        // 设置currentSpace
-        stack.add(fs);
+        symbolTable.setCurrentScope(callScope);
 
         // call
         Value result = visit(functionNode.getBody());
-
-        // pop currentSpace
-        stack.remove(fs);
 
         // pop currentScope
         symbolTable.setCurrentScope(previousScope);
@@ -267,23 +234,6 @@ public class EvalVisitor implements GossipVisitor {
             }
         }
         return Value.VOID;
-    }
-
-
-    private MemorySpace getCurrentSpaceWithName(String name) {
-        if (stack.size() > 0) {
-            for (int i = stack.size() - 1; i >= 0; i--) {
-                MemorySpace memorySpace = stack.get(i);
-                if (memorySpace.get(name) != null) {
-                    return memorySpace;
-                }
-            }
-        }
-
-        if (globalSpace.get(name) != null) {
-            return globalSpace;
-        }
-        return null;
     }
 
     public Value visit(HeteroAST node) {

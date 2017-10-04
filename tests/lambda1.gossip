@@ -1,5 +1,3 @@
--- todo (lambda (param) (body))
-
 (define (add x) (+ x 1))
 
 (define (compose2 f g)

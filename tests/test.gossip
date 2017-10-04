@@ -1,6 +1,6 @@
-(print ( + (+ 11 3) 2))
-
--- string
-(print "hello gossip!")
-(setq str "haha")
-(print str)
+(setq a 1)
+(define (add x)
+    (+ x a))
+(define (add2 a b)
+    (+ a b))
+(print (add2 (add 2) (add 1)))

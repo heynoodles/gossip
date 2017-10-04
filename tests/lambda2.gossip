@@ -1,0 +1,10 @@
+(define (add x) (+ x 1))
+
+(define (compose2 f g)
+    (lambda (x) (f (g x))))
+
+(define (addTwice x)
+    ((compose2 add add) x))
+
+(print (addTwice 1))
+

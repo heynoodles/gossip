@@ -7,6 +7,7 @@ import com.gossip.lexer.Token;
 import com.gossip.lexer.TokenType;
 import com.gossip.symtab.*;
 import com.gossip.util.GossipException;
+import com.gossip.value.AnyType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -190,8 +191,6 @@ public class GossipParser extends Parser {
     }
 
     private HeteroAST lambda() throws GossipException {
-        // Scope previousScope = symbolTable.getCurrentScope();
-
         // (lambda (...params) body)
         match(TokenType.LAMBDA);
         match(TokenType.PAREN_BEGIN);
@@ -200,7 +199,6 @@ public class GossipParser extends Parser {
         while (LT(1).type != TokenType.PAREN_END) {
             NameNode name = (NameNode) s_expr();
             params.add(name);
-            symbolTable.getCurrentScope().define(new VariableSymbol(name.getToken().text));
         }
         match(TokenType.PAREN_END);
 
@@ -212,7 +210,6 @@ public class GossipParser extends Parser {
             params,
             body
         );
-        // symbolTable.setCurrentScope(previousScope);
 
         return functionNode;
     }
@@ -246,6 +243,7 @@ public class GossipParser extends Parser {
         NameNode funName = null;
         MethodSymbol methodSymbol = null;
         HeteroAST body = null;
+        FunctionNode functionNode = null;
         List<NameNode> params = new ArrayList<NameNode>();
 
         if (LT(1).type == TokenType.PAREN_BEGIN) {
@@ -255,49 +253,35 @@ public class GossipParser extends Parser {
 
             // build scope
             methodSymbol = new MethodSymbol(funName.getToken().text, previousScope);
-            previousScope.define(methodSymbol);
+            previousScope.define(funName.getToken().text, methodSymbol);
             symbolTable.setCurrentScope(methodSymbol);
 
             // parse params
             while (LT(1).type != TokenType.PAREN_END) {
                 NameNode name = (NameNode) s_expr();
                 params.add(name);
-                symbolTable.getCurrentScope().define(new Symbol(name.getToken().text));
             }
             match(TokenType.PAREN_END);
             // parse body
             body = s_expr();
+
+            functionNode = new FunctionNode(
+                new Token(TokenType.DEFINE, "define"),
+                funName,
+                params,
+                body
+            );
         } else {
-            // case 2: (define funName (lambda (...params) body))
+            // case 2: (define funName (lambda (...params) body)) or returns a functionNode
             funName = (NameNode) s_expr();
 
             // build scope
             methodSymbol = new MethodSymbol(funName.getToken().text, previousScope);
-            previousScope.define(methodSymbol);
+            previousScope.define(funName.getToken().text, methodSymbol);
             symbolTable.setCurrentScope(methodSymbol);
 
-            match(TokenType.PAREN_BEGIN);
-            match(TokenType.LAMBDA);
-
-            match(TokenType.PAREN_BEGIN);
-            // parse params
-            while (LT(1).type != TokenType.PAREN_END) {
-                NameNode name = (NameNode) s_expr();
-                params.add(name);
-                symbolTable.getCurrentScope().define(new Symbol(name.getToken().text));
-            }
-            match(TokenType.PAREN_END);
-            // parse body
-            body = s_expr();
-            match(TokenType.PAREN_END);
+            functionNode = (FunctionNode) s_expr();
         }
-
-        FunctionNode functionNode = new FunctionNode(
-            new Token(TokenType.DEFINE, "define"),
-            funName,
-            params,
-            body
-        );
 
         methodSymbol.setFunctionNode(functionNode);
         symbolTable.setCurrentScope(previousScope);
@@ -308,7 +292,7 @@ public class GossipParser extends Parser {
     private HeteroAST setq() throws GossipException {
         match(TokenType.SETQ);
         NameNode name = (NameNode) s_expr();
-        symbolTable.getCurrentScope().define(new VariableSymbol(name.getToken().text));
+        symbolTable.getCurrentScope().define(name.getToken().text, new AnyType());
         HeteroAST valNode = s_expr();
         return new SetqNode(new Token(TokenType.SETQ, "setq"), name, valNode);
     }

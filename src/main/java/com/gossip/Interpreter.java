@@ -2,7 +2,6 @@ package com.gossip;
 
 import com.gossip.ast.HeteroAST;
 import com.gossip.lexer.GossipLexer;
-import com.gossip.memory.MemorySpace;
 import com.gossip.parser.GossipParser;
 import com.gossip.symtab.SymbolTable;
 import com.gossip.util.GossipException;
@@ -21,7 +20,6 @@ public class Interpreter {
 
     private SymbolTable symbolTable = new SymbolTable();
 
-    private MemorySpace memorySpace = new MemorySpace("global");
 
     public Interpreter(String file) {
         this.fileContent = Util.readFile(file);
@@ -33,7 +31,7 @@ public class Interpreter {
         GossipLexer lexer = new GossipLexer(fileContent);
         GossipParser parser = new GossipParser(lexer, 2, symbolTable);
         HeteroAST expr = parser.parse();
-        return expr.visit(new EvalVisitor(symbolTable, memorySpace));
+        return expr.visit(new EvalVisitor(symbolTable));
     }
 
     public void repl() throws GossipException {
@@ -71,7 +69,7 @@ public class Interpreter {
 //            new Interpreter().repl();
 //        }
 
-        new Interpreter("tests/lambda1.gossip")
+        new Interpreter("tests/test2.gossip")
             .interp();
 
     }

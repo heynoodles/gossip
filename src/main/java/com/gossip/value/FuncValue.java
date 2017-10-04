@@ -1,6 +1,6 @@
 package com.gossip.value;
 
-import com.gossip.symtab.MethodSymbol;
+import com.gossip.symtab.CallScope;
 
 /**
  * @author gaoxin.wei
@@ -8,17 +8,17 @@ import com.gossip.symtab.MethodSymbol;
 public class FuncValue extends Value<String> {
 
     // 返回的函数 需要把当时的环境也带出去
-    private MethodSymbol scope;
+    private CallScope scope;
 
     public FuncValue(String funcName) {
         this.value = funcName;
     }
 
-    public MethodSymbol getScope() {
+    public CallScope getScope() {
         return scope;
     }
 
-    public void setScope(MethodSymbol scope) {
+    public void setScope(CallScope scope) {
         this.scope = scope;
     }
 
