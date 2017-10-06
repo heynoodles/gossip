@@ -20,9 +20,6 @@ public class GossipLexer extends Lexer {
                 case '\r':
                     WS();
                     continue;
-                case ',':
-                    consume();
-                    return new Token(TokenType.COMMA, ",");
                 case '(':
                     consume();
                     return new Token(TokenType.PAREN_BEGIN, "(");

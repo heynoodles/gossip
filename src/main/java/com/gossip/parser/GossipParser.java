@@ -153,7 +153,7 @@ public class GossipParser extends Parser {
         // (let binder body)
         match(TokenType.LET);
 
-        // parse  binder: ((var val))
+        // parse binder: ((var val))
         List<VarAndValNode> params = new ArrayList<VarAndValNode>();
         match(TokenType.PAREN_BEGIN);
         while (LT(1).type != TokenType.PAREN_END) {
