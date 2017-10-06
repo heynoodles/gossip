@@ -34,6 +34,6 @@ public class Sub extends PrimFun {
             return Binder.<Integer, Double>lift((v1, v2) -> v1 - v2).apply(right, left);
         }
 
-        throw new Error("eval subtract node error");
+        throw new Error("eval sub fun error");
     }
 }

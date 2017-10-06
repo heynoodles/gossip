@@ -145,9 +145,7 @@ public class GossipParser extends Parser {
     }
 
     private HeteroAST call() throws GossipException {
-        // Token root = LT(1);
         HeteroAST operator = s_expr();
-        // consume();
         // (fun p1 p2 ...)
         List<HeteroAST> params = new ArrayList<HeteroAST>();
         while (LT(1).type != TokenType.PAREN_END) {

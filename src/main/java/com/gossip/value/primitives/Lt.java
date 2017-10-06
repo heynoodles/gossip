@@ -28,6 +28,6 @@ public class Lt extends PrimFun {
         if (left instanceof FloatValue && right instanceof IntValue) {
             return ((FloatValue) left).getValue() < ((IntValue) right).getValue() ? Value.TRUE : Value.FALSE;
         }
-        throw new Error("eval gt run");
+        throw new Error("eval lt fun error");
     }
 }

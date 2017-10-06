@@ -60,18 +60,13 @@ public class Interpreter {
 
 
     public static void main(String[] args) throws GossipException {
-
-//        if (args.length > 0) {
-//            String fileName = args[0];
-//            new Interpreter(fileName)
-//                .interp();
-//        } else {
-//            new Interpreter().repl();
-//        }
-
-        new Interpreter("tests/test2.gossip")
-            .interp();
-
+        if (args.length > 0) {
+            String fileName = args[0];
+            new Interpreter(fileName)
+                .interp();
+        } else {
+            new Interpreter().repl();
+        }
     }
 
 }

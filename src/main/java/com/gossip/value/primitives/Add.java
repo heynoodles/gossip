@@ -34,6 +34,6 @@ public class Add extends PrimFun {
             return Binder.<Integer, Double>lift((v1, v2) -> v1 + v2).apply(right, left);
         }
 
-        throw new Error("eval add node error");
+        throw new Error("eval add fun error");
     }
 }

@@ -32,6 +32,6 @@ public class Eq extends PrimFun {
             return ((FloatValue) left).getValue().doubleValue() == ((IntValue) right).getValue()
                 ? Value.TRUE : Value.FALSE;
         }
-        throw new Error("eval eq run");
+        throw new Error("eval eq fun error");
     }
 }

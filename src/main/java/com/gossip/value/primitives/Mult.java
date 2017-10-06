@@ -1,5 +1,6 @@
 package com.gossip.value.primitives;
 
+import com.gossip.util.Binder;
 import com.gossip.value.FloatValue;
 import com.gossip.value.IntValue;
 import com.gossip.value.PrimFun;
@@ -10,24 +11,29 @@ import java.util.List;
 /**
  * @author gaoxin.wei
  */
-public class Gt extends PrimFun {
+public class Mult extends PrimFun {
 
     @Override
     public Value apply(List<Value> args) {
         Value left = args.get(0);
         Value right = args.get(1);
+
         if (left instanceof IntValue && right instanceof IntValue) {
-            return ((IntValue) left).getValue() > ((IntValue) right).getValue() ? Value.TRUE : Value.FALSE;
+            return Binder.<Integer, Integer>lift(Math::multiplyExact).apply(left, right);
         }
+
         if (left instanceof FloatValue && right instanceof FloatValue) {
-            return ((FloatValue) left).getValue() > ((FloatValue) right).getValue() ? Value.TRUE : Value.FALSE;
+            return Binder.<Double, Double>lift((v1, v2) -> v1 * v2).apply(left, right);
         }
+
         if (left instanceof IntValue && right instanceof FloatValue) {
-            return ((IntValue) left).getValue() > ((FloatValue) right).getValue() ? Value.TRUE : Value.FALSE;
+            return Binder.<Integer, Double>lift((v1, v2) -> v1 * v2).apply(left, right);
         }
+
         if (left instanceof FloatValue && right instanceof IntValue) {
-            return ((FloatValue) left).getValue() > ((IntValue) right).getValue() ? Value.TRUE : Value.FALSE;
+            return Binder.<Integer, Double>lift((v1, v2) -> v1 * v2).apply(right, left);
         }
-        throw new Error("eval gt fun error");
+
+        throw new Error("eval mult fun error");
     }
 }

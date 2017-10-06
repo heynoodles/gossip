@@ -11,6 +11,8 @@ public class GlobalScope extends BaseScope {
         super("globals", null);
         symbols.put("+", new Add());
         symbols.put("-", new Sub());
+        symbols.put("*", new Mult());
+        symbols.put("/", new Div());
         symbols.put(">", new Gt());
         symbols.put("<", new Lt());
         symbols.put("=", new Eq());
