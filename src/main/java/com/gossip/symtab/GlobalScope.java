@@ -16,6 +16,8 @@ public class GlobalScope extends BaseScope {
         symbols.put(">", new Gt());
         symbols.put("<", new Lt());
         symbols.put("=", new Eq());
+        symbols.put(">=", new GtE());
+        symbols.put("<=", new LtE());
         symbols.put("and", new And());
         symbols.put("or", new Or());
         symbols.put("not", new Not());

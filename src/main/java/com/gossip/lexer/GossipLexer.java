@@ -216,7 +216,7 @@ public class GossipLexer extends Lexer {
 
 
     private boolean isLETTER() {
-        return Character.isLetterOrDigit(c);
+        return Character.isLetterOrDigit(c) || c == '=';
     }
 
     private boolean isDefine() {
