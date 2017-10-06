@@ -1,29 +1,19 @@
 package com.gossip.value;
 
-import com.gossip.symtab.CallScope;
+import com.gossip.symtab.ClosureScope;
 
 /**
  * @author gaoxin.wei
+ * 返回闭包 需要把当时的环境也带出去
  */
-public class ClosureValue extends Value<String> {
+public class ClosureValue extends Value<ClosureScope> {
 
-    // 返回的函数 需要把当时的环境也带出去
-    private CallScope scope;
-
-    public ClosureValue(String funcName) {
-        this.value = funcName;
-    }
-
-    public CallScope getScope() {
-        return scope;
-    }
-
-    public void setScope(CallScope scope) {
-        this.scope = scope;
+    public ClosureValue(ClosureScope scope) {
+        this.value = scope;
     }
 
     @Override
-    public Value create(String value) {
+    public Value create(ClosureScope value) {
         return null;
     }
 }

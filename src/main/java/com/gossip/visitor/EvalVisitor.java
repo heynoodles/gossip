@@ -99,11 +99,8 @@ public class EvalVisitor implements GossipVisitor {
     }
 
     private Value FUNCTION(FunctionNode node) {
-        ClosureValue funcValue = new ClosureValue("lambda");
-        ClosureScope closure = new ClosureScope("lambda", symbolTable.getCurrentScope());
-        closure.setFunctionNode(node);
-        funcValue.setScope(closure);
-        return funcValue;
+        ClosureScope closure = new ClosureScope(symbolTable.getCurrentScope(), node);
+        return new ClosureValue(closure);
     }
 
     private Value CALL(CallNode callNode) {
@@ -139,7 +136,7 @@ public class EvalVisitor implements GossipVisitor {
             // case 3: still list
             Value val = CALL((CallNode) operator);
             ClosureValue funcValue = (ClosureValue)val;
-            callScope = funcValue.getScope();
+            callScope = funcValue.getValue();
             functionNode = ((ClosureScope)callScope).getFunctionNode();
         }
 
