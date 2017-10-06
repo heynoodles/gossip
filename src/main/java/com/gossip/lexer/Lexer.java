@@ -37,7 +37,14 @@ public abstract class Lexer {
         }
     }
 
-    public boolean lookAhead(String val) {
+    public char lookahead(int q) {
+        if (q >= input.length()) {
+            return EOF;
+        }
+        return input.charAt(q);
+    }
+
+    public boolean safeMatch(String val) {
         char[] chars = val.toCharArray();
         int q = p;
         for (char c : chars) {

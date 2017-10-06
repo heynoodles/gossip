@@ -35,23 +35,8 @@ public class GossipLexer extends Lexer {
                 case ')':
                     consume();
                     return new Token(TokenType.PAREN_END, ")");
-                case '+':
-                    consume();
-                    return new Token(TokenType.NAME, "+");
-                case '-':
-                    consume();
-                    return new Token(TokenType.NAME, "-");
-                case '>':
-                    consume();
-                    return new Token(TokenType.NAME, ">");
-                case '<':
-                    consume();
-                    return new Token(TokenType.NAME, "<");
-                case '=':
-                    consume();
-                    return new Token(TokenType.NAME, "=");
                 default:
-                    if (isDigit()) {
+                    if (isNumber()) {
                         return NUMBER();
                     } else if (isString()) {
                         return STRING();
@@ -95,7 +80,7 @@ public class GossipLexer extends Lexer {
     }
 
     private boolean isCond() {
-        return lookAhead("cond");
+        return safeMatch("cond");
     }
 
     private Token COND() {
@@ -113,19 +98,19 @@ public class GossipLexer extends Lexer {
     }
 
     private boolean isSetq() {
-        return lookAhead("setq");
+        return safeMatch("setq");
     }
 
     private boolean isCar() {
-        return lookAhead("car");
+        return safeMatch("car");
     }
 
     private boolean isCdr() {
-        return lookAhead("cdr");
+        return safeMatch("cdr");
     }
 
     private boolean isCons() {
-        return lookAhead("cons");
+        return safeMatch("cons");
     }
 
     private Token CAR() {
@@ -149,22 +134,56 @@ public class GossipLexer extends Lexer {
         return new Token(TokenType.CONS, "cons");
     }
 
+    private boolean isNumber() {
+        StringBuilder buf = new StringBuilder();
+        int q = p;
+        char val = lookahead(q++);
+        while (isDigit(val)) {
+            buf.append(val);
+            val = lookahead(q++);
+        }
+        return isIntValue(buf.toString()) || isFloatValue(buf.toString());
+    }
+
     private Token NUMBER() {
         StringBuilder buf = new StringBuilder();
         do {
             buf.append(c);
             consume();
         } while (isDigit());
-        try {
-            Integer val = Integer.valueOf(buf.toString());
+        if (isIntValue(buf.toString())) {
             return new Token(TokenType.INT, buf.toString());
-        } catch (NumberFormatException e) {
+        } else if (isFloatValue(buf.toString())) {
             return new Token(TokenType.FLOAT, buf.toString());
+        } else {
+            throw new RuntimeException("not a number");
+        }
+    }
+
+    private boolean isFloatValue(String value) {
+        try {
+            Double val = Double.valueOf(value);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    private boolean isIntValue(String value) {
+        try {
+            Integer val = Integer.valueOf(value);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
         }
     }
 
     private boolean isDigit() {
-        return Character.isDigit(c) || c == '.' || c == '+' || c == '-';
+        return isDigit(c);
+    }
+
+    private boolean isDigit(char val) {
+        return Character.isDigit(val) || val == '.' || val == '+' || val == '-';
     }
 
     private Token NAME() {
@@ -182,11 +201,10 @@ public class GossipLexer extends Lexer {
         }
     }
 
-
     public boolean skipComments() {
         boolean found = false;
 
-        if (lookAhead("--")) {
+        if (safeMatch("--")) {
             found = true;
 
             // skip to line end
@@ -208,7 +226,7 @@ public class GossipLexer extends Lexer {
     }
 
     private boolean isDefine() {
-        return lookAhead("define");
+        return safeMatch("define");
     }
 
     private Token DEFINE() {
@@ -219,7 +237,7 @@ public class GossipLexer extends Lexer {
     }
 
     private boolean isLet() {
-        return lookAhead("let");
+        return safeMatch("let");
     }
 
     private Token LET() {
@@ -231,7 +249,7 @@ public class GossipLexer extends Lexer {
 
 
     private boolean isLambda() {
-        return lookAhead("lambda");
+        return safeMatch("lambda");
     }
 
     private Token LAMBDA() {
