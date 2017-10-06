@@ -37,19 +37,19 @@ public class GossipLexer extends Lexer {
                     return new Token(TokenType.PAREN_END, ")");
                 case '+':
                     consume();
-                    return new Token(TokenType.ADD, "+");
+                    return new Token(TokenType.NAME, "+");
                 case '-':
                     consume();
-                    return new Token(TokenType.SUBTRACT, "-");
+                    return new Token(TokenType.NAME, "-");
                 case '>':
                     consume();
-                    return new Token(TokenType.GT, ">");
+                    return new Token(TokenType.NAME, ">");
                 case '<':
                     consume();
-                    return new Token(TokenType.LT, "<");
+                    return new Token(TokenType.NAME, "<");
                 case '=':
                     consume();
-                    return new Token(TokenType.EQ, "=");
+                    return new Token(TokenType.NAME, "=");
                 default:
                     if (isDigit()) {
                         return NUMBER();
@@ -57,8 +57,6 @@ public class GossipLexer extends Lexer {
                         return STRING();
                     } else if (isCons()) {
                         return CONS();
-                    } else if (isPrint()) {
-                        return PRINT();
                     } else if (isCar()) {
                         return CAR();
                     } else if (isCdr()) {
@@ -73,10 +71,8 @@ public class GossipLexer extends Lexer {
                         return LET();
                     } else if (isLambda()) {
                         return LAMBDA();
-                    } else if (isLETTER()) {
-                        return NAME();
                     } else {
-                        throw new Error("invalid character: " + c);
+                        return NAME();
                     }
             }
         }
@@ -120,10 +116,6 @@ public class GossipLexer extends Lexer {
         return lookAhead("setq");
     }
 
-    private boolean isPrint() {
-        return lookAhead("print");
-    }
-
     private boolean isCar() {
         return lookAhead("car");
     }
@@ -134,13 +126,6 @@ public class GossipLexer extends Lexer {
 
     private boolean isCons() {
         return lookAhead("cons");
-    }
-
-    private Token PRINT() {
-        for (char c : "print".toCharArray()) {
-            match(c);
-        }
-        return new Token(TokenType.PRINT, "print");
     }
 
     private Token CAR() {

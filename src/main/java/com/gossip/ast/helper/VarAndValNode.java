@@ -1,4 +1,7 @@
-package com.gossip.ast;
+package com.gossip.ast.helper;
+
+import com.gossip.ast.HeteroAST;
+import com.gossip.ast.NameNode;
 
 /**
  * @author gaoxin.wei

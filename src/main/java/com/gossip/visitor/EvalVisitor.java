@@ -1,10 +1,14 @@
 package com.gossip.visitor;
 
 import com.gossip.ast.*;
+import com.gossip.ast.helper.TestAndActionNode;
+import com.gossip.ast.helper.VarAndValNode;
 import com.gossip.symtab.*;
-import com.gossip.util.Binder;
 import com.gossip.value.*;
 import com.gossip.value.cons.Cons;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -30,28 +34,6 @@ public class EvalVisitor implements GossipVisitor {
         return new StringValue(node.getToken().text);
     }
 
-    private Value ADD(AddNode addNode) {
-        Value left = addNode.getLeft().visit(this);
-        Value right = addNode.getRight().visit(this);
-
-        if (left instanceof IntValue && right instanceof IntValue) {
-            return Binder.<Integer, Integer>lift(Math::addExact).apply(left, right);
-        }
-
-        if (left instanceof FloatValue && right instanceof FloatValue) {
-            return Binder.<Double, Double>lift((v1, v2) -> v1 + v2).apply(left, right);
-        }
-
-        if (left instanceof IntValue && right instanceof FloatValue) {
-            return Binder.<Integer, Double>lift((v1, v2) -> v1 + v2).apply(left, right);
-        }
-
-        if (left instanceof FloatValue && right instanceof IntValue) {
-            return Binder.<Integer, Double>lift((v1, v2) -> v1 + v2).apply(right, left);
-        }
-
-        throw new Error("eval add node error");
-    }
 
     private Value CONS(ConsNode consNode) {
         Value leftVal = consNode.getLeft().visit(this);
@@ -69,35 +51,6 @@ public class EvalVisitor implements GossipVisitor {
         Value val = node.getValue().visit(this);
         ConsValue consValue = (ConsValue)val;
         return consValue.getValue().getRight();
-    }
-
-    private Value SUBTRACT(SubtractNode minusNode) {
-        Value left = minusNode.getLeft().visit(this);
-        Value right = minusNode.getRight().visit(this);
-
-        if (left instanceof IntValue && right instanceof IntValue) {
-            return Binder.<Integer, Integer>lift(Math::subtractExact).apply(left, right);
-        }
-
-        if (left instanceof FloatValue && right instanceof FloatValue) {
-            return Binder.<Double, Double>lift((v1, v2) -> v1 - v2).apply(left, right);
-        }
-
-        if (left instanceof IntValue && right instanceof FloatValue) {
-            return Binder.<Integer, Double>lift((v1, v2) -> v1 - v2).apply(left, right);
-        }
-
-        if (left instanceof FloatValue && right instanceof IntValue) {
-            return Binder.<Integer, Double>lift((v1, v2) -> v1 - v2).apply(right, left);
-        }
-
-        throw new Error("eval subtract node error");
-    }
-
-    private Value PRINT(PrintNode printNode) {
-        Value val = printNode.getParam().visit(this);
-        System.out.println(val);
-        return Value.VOID;
     }
 
     private Value MAIN(MainNode mainNode) {
@@ -162,13 +115,28 @@ public class EvalVisitor implements GossipVisitor {
         FunctionNode functionNode = null;
         if (operator instanceof NameNode) {
             String funcName = operator.getToken().text;
-            methodSymbol = (MethodSymbol) symbolTable.getSymbolWithName(funcName);
-            if (methodSymbol == null) {
-                throw new Error("unsupported symbol type");
+            Value symbol = symbolTable.getSymbolWithName(funcName);
+            // case 1: primitive func
+            if (symbol instanceof PrimFun) {
+                PrimFun primFun = (PrimFun) symbol;
+                // prepare args
+                List<Value> args = new ArrayList<Value>();
+                for (HeteroAST heteroAST : callNode.getParams()) {
+                    Value arg = heteroAST.visit(this);
+                    args.add(arg);
+                }
+                return primFun.apply(args);
+            } else {
+                // case 2: custom func
+                methodSymbol = (MethodSymbol) symbolTable.getSymbolWithName(funcName);
+                if (methodSymbol == null) {
+                    throw new Error("unsupported symbol type");
+                }
+                callScope = new CallScope(funcName, symbolTable.getCurrentScope());
+                functionNode = methodSymbol.getFunctionNode();
             }
-            callScope = new CallScope(funcName, symbolTable.getCurrentScope());
-            functionNode = methodSymbol.getFunctionNode();
         } else if (operator instanceof CallNode) {
+            // case 3: still list
             Value val = CALL((CallNode) operator);
             FuncValue funcValue = (FuncValue)val;
             callScope = funcValue.getScope();
@@ -198,34 +166,6 @@ public class EvalVisitor implements GossipVisitor {
         return result;
     }
 
-    private Value GT(GTNode node) {
-        Value left = node.getLeft().visit(this);
-        Value right = node.getRight().visit(this);
-        if (left instanceof IntValue && right instanceof IntValue) {
-            return ((IntValue) left).getValue() > ((IntValue) right).getValue() ? Value.TRUE : Value.FALSE;
-        }
-        throw new Error("eval gt run");
-    }
-
-    private Value LT(LTNode node) {
-        Value left = node.getLeft().visit(this);
-        Value right = node.getRight().visit(this);
-        if (left instanceof IntValue && right instanceof IntValue) {
-            return ((IntValue) left).getValue() < ((IntValue) right).getValue() ? Value.TRUE : Value.FALSE;
-        }
-        throw new Error("eval lt run");
-    }
-
-    private Value EQ(EQNode node) {
-        Value left = node.getLeft().visit(this);
-        Value right = node.getRight().visit(this);
-        if (left instanceof IntValue && right instanceof IntValue) {
-            return ((IntValue) left).getValue().intValue() == ((IntValue) right).getValue()
-                    ? Value.TRUE : Value.FALSE;
-        }
-        throw new Error("eval eq run");
-    }
-
     private Value COND(CondNode node) {
         for (TestAndActionNode block : node.getBlocks()) {
             BoolValue testVal = (BoolValue) block.getTest().visit(this);
@@ -245,22 +185,10 @@ public class EvalVisitor implements GossipVisitor {
             return FLOAT((FloatNode)node);
         } else if (node instanceof StringNode) {
             return STRING((StringNode)node);
-        } else if (node instanceof AddNode) {
-            return ADD((AddNode)node);
-        } else if (node instanceof SubtractNode) {
-            return SUBTRACT((SubtractNode)node);
-        } else if (node instanceof PrintNode) {
-            return PRINT((PrintNode)node);
         } else if (node instanceof SetqNode) {
             return SETQ((SetqNode) node);
         } else if (node instanceof NameNode) {
             return NAME((NameNode)node);
-        } else if (node instanceof GTNode) {
-            return GT((GTNode)node);
-        } else if (node instanceof LTNode) {
-            return LT((LTNode) node);
-        } else if (node instanceof EQNode) {
-            return EQ((EQNode)node);
         } else if (node instanceof CallNode) {
             return CALL((CallNode)node);
         } else if (node instanceof CondNode) {

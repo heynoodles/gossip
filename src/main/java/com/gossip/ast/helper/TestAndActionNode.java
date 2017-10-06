@@ -1,4 +1,6 @@
-package com.gossip.ast;
+package com.gossip.ast.helper;
+
+import com.gossip.ast.HeteroAST;
 
 /**
  * Created by gaoxinwei on 2017/9/26.

@@ -1,5 +1,6 @@
 package com.gossip.ast;
 
+import com.gossip.ast.helper.VarAndValNode;
 import com.gossip.lexer.Token;
 import com.gossip.value.Value;
 import com.gossip.visitor.GossipVisitor;

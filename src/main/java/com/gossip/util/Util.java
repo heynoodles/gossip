@@ -6,6 +6,8 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author gaoxin.wei
@@ -31,5 +33,18 @@ public class Util {
         } catch (Exception e) {
             return "";
         }
+    }
+
+    public static List<String> getFilePaths(String filepath) throws IOException {
+        List<String> result = new ArrayList<>();
+        File file = new File(unifyPath(filepath));
+
+        String[] fileList = file.list();
+        for (int i = 0; i < fileList.length; i++) {
+            File curFile = new File(filepath + "/" + fileList[i]);
+            result.add(curFile.getCanonicalPath());
+        }
+
+        return result;
     }
 }
