@@ -73,9 +73,6 @@ void
 gossip> (print "hello world")
 "hello world"
 void
-gossip> (print "hello world")
-"hello world"
-void
 gossip> (print (cons 1 (cons 2 3)))
 (1 . (2 . 3))
 void
