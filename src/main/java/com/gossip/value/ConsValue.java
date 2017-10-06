@@ -1,13 +1,13 @@
 package com.gossip.value;
 
-import com.gossip.value.cons.Cons;
+import com.gossip.value.cons.ConsInner;
 
 /**
  * Created by gaoxinwei on 2017/9/29.
  */
-public class ConsValue extends Value<Cons> {
+public class ConsValue extends Value<ConsInner> {
 
-    public ConsValue(Cons cons) {
+    public ConsValue(ConsInner cons) {
         this.value = cons;
     }
 
@@ -17,7 +17,7 @@ public class ConsValue extends Value<Cons> {
     }
 
     @Override
-    public Value create(Cons value) {
+    public Value create(ConsInner value) {
         return new ConsValue(value);
     }
 }

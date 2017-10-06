@@ -34,12 +34,6 @@ public class GossipLexer extends Lexer {
                         return NUMBER();
                     } else if (isString()) {
                         return STRING();
-                    } else if (isCons()) {
-                        return CONS();
-                    } else if (isCar()) {
-                        return CAR();
-                    } else if (isCdr()) {
-                        return CDR();
                     } else if (isSetq()) {
                         return SETQ();
                     } else if (isCond()) {
@@ -95,46 +89,11 @@ public class GossipLexer extends Lexer {
         return safeMatch("setq");
     }
 
-    private boolean isCar() {
-        return safeMatch("car");
-    }
-
-    private boolean isCdr() {
-        return safeMatch("cdr");
-    }
-
-    private boolean isCons() {
-        return safeMatch("cons");
-    }
-
-    private Token CAR() {
-        for (char c : "car".toCharArray()) {
-            match(c);
-        }
-        return new Token(TokenType.CAR, "car");
-    }
-
-    private Token CDR() {
-        for (char c : "cdr".toCharArray()) {
-            match(c);
-        }
-        return new Token(TokenType.CDR, "cdr");
-    }
-
-    private Token CONS() {
-        for (char c : "cons".toCharArray()) {
-            match(c);
-        }
-        return new Token(TokenType.CONS, "cons");
-    }
-
     private boolean isNumber() {
         StringBuilder buf = new StringBuilder();
         int q = p;
-        char val = lookahead(q++);
-        while (isDigit(val)) {
+        for (char val = c; isDigit(val); val = lookahead(++q)) {
             buf.append(val);
-            val = lookahead(q++);
         }
         return isIntValue(buf.toString()) || isFloatValue(buf.toString());
     }

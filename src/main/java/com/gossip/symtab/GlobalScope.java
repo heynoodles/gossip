@@ -9,6 +9,10 @@ public class GlobalScope extends BaseScope {
 
     public GlobalScope() {
         super("globals", null);
+        initPrimitiveFunctions();
+    }
+
+    private void initPrimitiveFunctions() {
         symbols.put("+", Value.ADD);
         symbols.put("-", Value.SUB);
         symbols.put("*", Value.MULT);
@@ -22,5 +26,8 @@ public class GlobalScope extends BaseScope {
         symbols.put("or", Value.OR);
         symbols.put("not", Value.NOT);
         symbols.put("print", Value.PRINT);
+        symbols.put("car", Value.CAR);
+        symbols.put("cdr", Value.CDR);
+        symbols.put("cons", Value.CONS);
     }
 }

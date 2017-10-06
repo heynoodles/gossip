@@ -89,12 +89,6 @@ public class GossipParser extends Parser {
             define();
         } else if (LT(1).type == TokenType.COND) {
             result = cond();
-        } else if (LT(1).type == TokenType.CONS) {
-            result = cons();
-        } else if (LT(1).type == TokenType.CAR) {
-            result = car();
-        } else if (LT(1).type == TokenType.CDR) {
-            result = cdr();
         } else if (LT(1).type == TokenType.LET) {
             result = let();
         } else if (LT(1).type == TokenType.LAMBDA) {
@@ -121,28 +115,6 @@ public class GossipParser extends Parser {
             blocks.add(block);
         }
         return new CondNode(new Token(TokenType.COND, "cond"), blocks);
-    }
-
-    private HeteroAST cons() throws GossipException {
-        // (cons val1 val2)
-        match(TokenType.CONS);
-        HeteroAST left = s_expr();
-        HeteroAST right = s_expr();
-        return new ConsNode(new Token(TokenType.CONS, "cons"), left, right);
-    }
-
-    private HeteroAST car() throws GossipException {
-        // (car cons1)
-        match(TokenType.CAR);
-        HeteroAST node = s_expr();
-        return new CarNode(new Token(TokenType.CAR, "car"), node);
-    }
-
-    private HeteroAST cdr() throws GossipException {
-        // (cdr cons1)
-        match(TokenType.CDR);
-        HeteroAST node = s_expr();
-        return new CdrNode(new Token(TokenType.CDR, "cdr"), node);
     }
 
     private HeteroAST call() throws GossipException {

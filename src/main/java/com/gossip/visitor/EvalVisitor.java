@@ -3,9 +3,11 @@ package com.gossip.visitor;
 import com.gossip.ast.*;
 import com.gossip.ast.helper.TestAndActionNode;
 import com.gossip.ast.helper.VarAndValNode;
-import com.gossip.symtab.*;
+import com.gossip.symtab.CallScope;
+import com.gossip.symtab.ClosureScope;
+import com.gossip.symtab.Scope;
+import com.gossip.symtab.SymbolTable;
 import com.gossip.value.*;
-import com.gossip.value.cons.Cons;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,25 +34,6 @@ public class EvalVisitor implements GossipVisitor {
 
     private StringValue STRING(StringNode node) {
         return new StringValue(node.getToken().text);
-    }
-
-
-    private Value CONS(ConsNode consNode) {
-        Value leftVal = consNode.getLeft().visit(this);
-        Value rightVal = consNode.getRight().visit(this);
-        return new ConsValue(new Cons(leftVal, rightVal));
-    }
-
-    private Value CAR(CarNode node) {
-        Value val = node.getValue().visit(this);
-        ConsValue consValue = (ConsValue)val;
-        return consValue.getValue().getLeft();
-    }
-
-    private Value CDR(CdrNode node) {
-        Value val = node.getValue().visit(this);
-        ConsValue consValue = (ConsValue)val;
-        return consValue.getValue().getRight();
     }
 
     private Value MAIN(MainNode mainNode) {
@@ -190,12 +173,6 @@ public class EvalVisitor implements GossipVisitor {
             return CALL((CallNode)node);
         } else if (node instanceof CondNode) {
             return COND((CondNode)node);
-        } else if (node instanceof ConsNode) {
-            return CONS((ConsNode)node);
-        } else if (node instanceof CarNode) {
-            return CAR((CarNode)node);
-        } else if (node instanceof CdrNode) {
-            return CDR((CdrNode)node);
         } else if (node instanceof LetNode) {
             return LET((LetNode)node);
         } else if (node instanceof FunctionNode) {

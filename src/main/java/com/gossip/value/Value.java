@@ -33,7 +33,9 @@ public abstract class Value<T> implements Monad<T> {
     public final static Not NOT = new Not();
     public final static Or OR = new Or();
     public final static Print PRINT = new Print();
-
+    public final static Car CAR = new Car();
+    public final static Cdr CDR = new Cdr();
+    public final static Cons CONS = new Cons();
 
     public abstract Value create(T value);
 
