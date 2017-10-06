@@ -9,8 +9,4 @@ public abstract class PrimFun extends Value {
 
     public abstract Value apply(List<Value> args);
 
-    @Override
-    public Value create(Object value) {
-        return null;
-    }
 }

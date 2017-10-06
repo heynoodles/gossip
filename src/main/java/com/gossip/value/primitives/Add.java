@@ -36,4 +36,9 @@ public class Add extends PrimFun {
 
         throw new Error("eval add fun error");
     }
+
+    @Override
+    public Value create(Object value) {
+        return ADD;
+    }
 }

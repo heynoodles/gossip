@@ -34,4 +34,9 @@ public class Eq extends PrimFun {
         }
         throw new Error("eval eq fun error");
     }
+
+    @Override
+    public Value create(Object value) {
+        return EQ;
+    }
 }

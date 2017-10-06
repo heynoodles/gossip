@@ -30,4 +30,9 @@ public class Gt extends PrimFun {
         }
         throw new Error("eval gt fun error");
     }
+
+    @Override
+    public Value create(Object value) {
+        return GT;
+    }
 }

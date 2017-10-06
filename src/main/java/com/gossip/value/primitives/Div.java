@@ -36,4 +36,9 @@ public class Div extends PrimFun {
 
         throw new Error("eval div fun error");
     }
+
+    @Override
+    public Value create(Object value) {
+        return DIV;
+    }
 }

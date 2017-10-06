@@ -30,4 +30,9 @@ public class LtE extends PrimFun {
         }
         throw new Error("eval gte fun error");
     }
+
+    @Override
+    public Value create(Object value) {
+        return LTE;
+    }
 }

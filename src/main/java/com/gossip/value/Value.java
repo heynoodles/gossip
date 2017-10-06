@@ -1,6 +1,7 @@
 package com.gossip.value;
 
 import com.gossip.util.Monad;
+import com.gossip.value.primitives.*;
 
 import java.util.function.Function;
 
@@ -19,6 +20,20 @@ public abstract class Value<T> implements Monad<T> {
     public final static VoidValue VOID = new VoidValue();
     public final static BoolValue TRUE = new BoolValue(true);
     public final static BoolValue FALSE = new BoolValue(false);
+    public final static Add ADD = new Add();
+    public final static Sub SUB = new Sub();
+    public final static And AND = new And();
+    public final static Div DIV = new Div();
+    public final static Eq  EQ = new Eq();
+    public final static Gt GT =new Gt();
+    public final static GtE GTE =new GtE();
+    public final static Lt LT = new Lt();
+    public final static LtE LTE = new LtE();
+    public final static Mult MULT = new Mult();
+    public final static Not NOT = new Not();
+    public final static Or OR = new Or();
+    public final static Print PRINT = new Print();
+
 
     public abstract Value create(T value);
 

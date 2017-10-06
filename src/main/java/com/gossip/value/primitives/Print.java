@@ -16,4 +16,9 @@ public class Print extends PrimFun {
         System.out.println(val);
         return Value.VOID;
     }
+
+    @Override
+    public Value create(Object value) {
+        return PRINT;
+    }
 }

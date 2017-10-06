@@ -36,4 +36,9 @@ public class Sub extends PrimFun {
 
         throw new Error("eval sub fun error");
     }
+
+    @Override
+    public Value create(Object value) {
+        return SUB;
+    }
 }

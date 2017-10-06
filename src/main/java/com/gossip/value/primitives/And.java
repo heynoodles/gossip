@@ -21,4 +21,9 @@ public class And extends PrimFun {
         }
         throw new Error("eval and fun error");
     }
+
+    @Override
+    public Value create(Object value) {
+        return AND;
+    }
 }

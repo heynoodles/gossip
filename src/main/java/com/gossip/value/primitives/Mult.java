@@ -36,4 +36,9 @@ public class Mult extends PrimFun {
 
         throw new Error("eval mult fun error");
     }
+
+    @Override
+    public Value create(Object value) {
+        return MULT;
+    }
 }

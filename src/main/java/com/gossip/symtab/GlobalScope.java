@@ -1,6 +1,6 @@
 package com.gossip.symtab;
 
-import com.gossip.value.primitives.*;
+import com.gossip.value.Value;
 
 /**
  * @author gaoxin.wei
@@ -9,18 +9,18 @@ public class GlobalScope extends BaseScope {
 
     public GlobalScope() {
         super("globals", null);
-        symbols.put("+", new Add());
-        symbols.put("-", new Sub());
-        symbols.put("*", new Mult());
-        symbols.put("/", new Div());
-        symbols.put(">", new Gt());
-        symbols.put("<", new Lt());
-        symbols.put("=", new Eq());
-        symbols.put(">=", new GtE());
-        symbols.put("<=", new LtE());
-        symbols.put("and", new And());
-        symbols.put("or", new Or());
-        symbols.put("not", new Not());
-        symbols.put("print", new Print());
+        symbols.put("+", Value.ADD);
+        symbols.put("-", Value.SUB);
+        symbols.put("*", Value.MULT);
+        symbols.put("/", Value.DIV);
+        symbols.put(">", Value.GT);
+        symbols.put("<", Value.LT);
+        symbols.put("=", Value.EQ);
+        symbols.put(">=", Value.GTE);
+        symbols.put("<=", Value.LTE);
+        symbols.put("and", Value.AND);
+        symbols.put("or", Value.OR);
+        symbols.put("not", Value.NOT);
+        symbols.put("print", Value.PRINT);
     }
 }

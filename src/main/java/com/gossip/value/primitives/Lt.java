@@ -30,4 +30,9 @@ public class Lt extends PrimFun {
         }
         throw new Error("eval lt fun error");
     }
+
+    @Override
+    public Value create(Object value) {
+        return LT;
+    }
 }
