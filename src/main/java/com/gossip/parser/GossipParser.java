@@ -7,7 +7,7 @@ import com.gossip.ast.helper.VarAndValNode;
 import com.gossip.lexer.Lexer;
 import com.gossip.lexer.Token;
 import com.gossip.lexer.TokenType;
-import com.gossip.symtab.*;
+import com.gossip.symtab.SymbolTable;
 import com.gossip.util.GossipException;
 import com.gossip.value.AnyType;
 import com.gossip.value.FunctionValue;
@@ -141,14 +141,12 @@ public class GossipParser extends Parser {
 
         HeteroAST body = s_expr();
 
-        FunctionNode functionNode = new FunctionNode(
+        return new FunctionNode(
             new Token(TokenType.DEFINE, "define"),
             new NameNode(new Token(TokenType.LAMBDA, "lambda")),
             params,
             body
         );
-
-        return functionNode;
     }
 
     private HeteroAST let() throws GossipException {
