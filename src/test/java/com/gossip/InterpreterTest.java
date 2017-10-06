@@ -12,7 +12,8 @@ import java.util.List;
 public class InterpreterTest {
 
     public static void main(String[] args) throws GossipException, IOException {
-        new Interpreter("tests/prim.gossip").interp();
+//        new Interpreter("tests/prim.gossip").interp();
+        test_all();
     }
 
     private static void test_all() throws IOException, GossipException {

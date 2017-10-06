@@ -99,7 +99,7 @@ public class EvalVisitor implements GossipVisitor {
     }
 
     private Value FUNCTION(FunctionNode node) {
-        FuncValue funcValue = new FuncValue("lambda");
+        ClosureValue funcValue = new ClosureValue("lambda");
         ClosureScope closure = new ClosureScope("lambda", symbolTable.getCurrentScope());
         closure.setFunctionNode(node);
         funcValue.setScope(closure);
@@ -138,7 +138,7 @@ public class EvalVisitor implements GossipVisitor {
         } else if (operator instanceof CallNode) {
             // case 3: still list
             Value val = CALL((CallNode) operator);
-            FuncValue funcValue = (FuncValue)val;
+            ClosureValue funcValue = (ClosureValue)val;
             callScope = funcValue.getScope();
             functionNode = ((ClosureScope)callScope).getFunctionNode();
         }
