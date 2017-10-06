@@ -176,17 +176,14 @@ public class GossipParser extends Parser {
     private HeteroAST define() throws GossipException {
         match(TokenType.DEFINE);
 
-        Scope previousScope = symbolTable.getCurrentScope();
         NameNode funName = null;
-        FunctionValue methodSymbol = null;
-        HeteroAST body = null;
         FunctionNode functionNode = null;
-        List<NameNode> params = new ArrayList<NameNode>();
 
         if (LT(1).type == TokenType.PAREN_BEGIN) {
             // case 1: (define (funName ...params) body)
             match(TokenType.PAREN_BEGIN);
             funName = (NameNode) s_expr();
+            List<NameNode> params = new ArrayList<NameNode>();
 
             // parse params
             while (LT(1).type != TokenType.PAREN_END) {
@@ -195,7 +192,7 @@ public class GossipParser extends Parser {
             }
             match(TokenType.PAREN_END);
             // parse body
-            body = s_expr();
+            HeteroAST body = s_expr();
 
             functionNode = new FunctionNode(
                 new Token(TokenType.DEFINE, "define"),
