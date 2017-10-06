@@ -1,6 +1,7 @@
 -- (let bind body)
---(setq a 1)
---(let ((p 1)(a 2)) (print (+ p a)))
+(setq a 1)
+
+(let ((p 1)(a 2)) (print (+ p a)))
 
 (define (f b)
     (let ((p 1)) (print (+ p b))))

@@ -1,6 +1,10 @@
-(print (+ 1 1.1))
+(define (addOne x)
+    (+ x 1))
+
+(print (addOne 3))
 
 (setq a 1)
+
 (define (add x)
     (+ x a))
 (define (add2 a b)

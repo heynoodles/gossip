@@ -1,8 +1,8 @@
 (setq a (cons 1
     (cons 2 3)))
 
-(print "car")
+-- 第1个地址空间
 (print (car a))
 
-(print "cdr")
+-- 第2个地址空间
 (print (cdr a))

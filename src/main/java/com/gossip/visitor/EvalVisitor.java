@@ -87,12 +87,12 @@ public class EvalVisitor implements GossipVisitor {
     }
 
     private Value CALL(CallNode callNode) {
-        // 获取functionNode
 
         HeteroAST operator = callNode.getOperator();
         FunctionValue methodSymbol = null;
         CallScope callScope = null;
         FunctionNode functionNode = null;
+
         if (operator instanceof NameNode) {
             String funcName = operator.getToken().text;
             Value symbol = symbolTable.getSymbolWithName(funcName);

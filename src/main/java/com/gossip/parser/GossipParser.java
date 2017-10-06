@@ -21,7 +21,7 @@ import java.util.List;
  * 语法如下：
  * -------------------------------------------
  * s_expr : list | atomic
- * list: '(' s_exp < s_exp > ')'
+ * list: '(' s_expr < s_expr > ')'
  * atomic: INT | FLOAT | STRING | NAME
  *  ------------------------------------------
  */
@@ -189,6 +189,7 @@ public class GossipParser extends Parser {
                 params.add(name);
             }
             match(TokenType.PAREN_END);
+
             // parse body
             HeteroAST body = s_expr();
 

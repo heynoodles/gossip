@@ -3,4 +3,4 @@
           ((= n 2) 1)
           ((> n 2) (+ (fibonacci (- n 2)) (fibonacci (- n 1))))))
 
-(print (fibonacci 4))
+(print (fibonacci 6))
