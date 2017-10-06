@@ -23,12 +23,6 @@ public class GossipLexer extends Lexer {
                 case ',':
                     consume();
                     return new Token(TokenType.COMMA, ",");
-                case '[':
-                    consume();
-                    return new Token(TokenType.LBRACK, "[");
-                case ']':
-                    consume();
-                    return new Token(TokenType.RBRACK, "]");
                 case '(':
                     consume();
                     return new Token(TokenType.PAREN_BEGIN, "(");
@@ -201,7 +195,7 @@ public class GossipLexer extends Lexer {
         }
     }
 
-    public boolean skipComments() {
+    private boolean skipComments() {
         boolean found = false;
 
         if (safeMatch("--")) {
@@ -221,7 +215,7 @@ public class GossipLexer extends Lexer {
     }
 
 
-    boolean isLETTER() {
+    private boolean isLETTER() {
         return Character.isLetterOrDigit(c);
     }
 
