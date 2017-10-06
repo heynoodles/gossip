@@ -10,6 +10,7 @@ import com.gossip.lexer.TokenType;
 import com.gossip.symtab.*;
 import com.gossip.util.GossipException;
 import com.gossip.value.AnyType;
+import com.gossip.value.FunctionValue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -205,7 +206,7 @@ public class GossipParser extends Parser {
 
         Scope previousScope = symbolTable.getCurrentScope();
         NameNode funName = null;
-        MethodSymbol methodSymbol = null;
+        FunctionValue methodSymbol = null;
         HeteroAST body = null;
         FunctionNode functionNode = null;
         List<NameNode> params = new ArrayList<NameNode>();
@@ -214,11 +215,6 @@ public class GossipParser extends Parser {
             // case 1: (define (funName ...params) body)
             match(TokenType.PAREN_BEGIN);
             funName = (NameNode) s_expr();
-
-            // build scope
-            methodSymbol = new MethodSymbol(funName.getToken().text, previousScope);
-            previousScope.define(funName.getToken().text, methodSymbol);
-            symbolTable.setCurrentScope(methodSymbol);
 
             // parse params
             while (LT(1).type != TokenType.PAREN_END) {
@@ -238,18 +234,11 @@ public class GossipParser extends Parser {
         } else {
             // case 2: (define funName (lambda (...params) body)) or returns a functionNode
             funName = (NameNode) s_expr();
-
-            // build scope
-            methodSymbol = new MethodSymbol(funName.getToken().text, previousScope);
-            previousScope.define(funName.getToken().text, methodSymbol);
-            symbolTable.setCurrentScope(methodSymbol);
-
             functionNode = (FunctionNode) s_expr();
         }
 
-        methodSymbol.setFunctionNode(functionNode);
-        symbolTable.setCurrentScope(previousScope);
-
+        // build scope
+        symbolTable.globalScope.define(funName.getToken().text, new FunctionValue(functionNode));
         return null;
     }
 

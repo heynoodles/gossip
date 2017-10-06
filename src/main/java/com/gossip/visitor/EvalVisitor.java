@@ -110,7 +110,7 @@ public class EvalVisitor implements GossipVisitor {
         // 获取functionNode
 
         HeteroAST operator = callNode.getOperator();
-        MethodSymbol methodSymbol = null;
+        FunctionValue methodSymbol = null;
         CallScope callScope = null;
         FunctionNode functionNode = null;
         if (operator instanceof NameNode) {
@@ -128,12 +128,12 @@ public class EvalVisitor implements GossipVisitor {
                 return primFun.apply(args);
             } else {
                 // case 2: custom func
-                methodSymbol = (MethodSymbol) symbolTable.getSymbolWithName(funcName);
+                methodSymbol = (FunctionValue) symbolTable.getSymbolWithName(funcName);
                 if (methodSymbol == null) {
                     throw new Error("unsupported symbol type");
                 }
                 callScope = new CallScope(funcName, symbolTable.getCurrentScope());
-                functionNode = methodSymbol.getFunctionNode();
+                functionNode = methodSymbol.getValue();
             }
         } else if (operator instanceof CallNode) {
             // case 3: still list

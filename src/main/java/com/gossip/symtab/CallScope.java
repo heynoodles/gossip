@@ -6,7 +6,6 @@ package com.gossip.symtab;
  */
 public class CallScope extends BaseScope {
 
-
     public CallScope(String scopeName, Scope enclosingScope) {
         super(scopeName, enclosingScope);
     }
