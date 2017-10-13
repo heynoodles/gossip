@@ -36,6 +36,7 @@ public abstract class Value<T> implements Monad<T> {
     public final static Car CAR = new Car();
     public final static Cdr CDR = new Cdr();
     public final static Cons CONS = new Cons();
+    public final static ConsList LIST = new ConsList();
 
     public abstract Value create(T value);
 

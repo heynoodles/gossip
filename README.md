@@ -86,6 +86,9 @@ gossip>
 -- 使用cons进行构造, 并且可以嵌套构造。
 (setq a (cons 1
     (cons 2 3)))
+   
+-- 使用list进行构造, 相当于cons的语法糖
+(setq b (list 1 2 3 4 5))
  
 -- 使用car命令，获取第1个地址空间, output: 1
 (print (car a))

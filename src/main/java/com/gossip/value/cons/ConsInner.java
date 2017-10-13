@@ -11,8 +11,18 @@ public class ConsInner {
 
     private Value right;
 
+    public ConsInner() {}
+
     public ConsInner(Value left, Value right) {
         this.left = left;
+        this.right = right;
+    }
+
+    public void setLeft(Value left) {
+        this.left = left;
+    }
+
+    public void setRight(Value right) {
         this.right = right;
     }
 

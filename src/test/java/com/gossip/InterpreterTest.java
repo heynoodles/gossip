@@ -12,7 +12,7 @@ import java.util.List;
 public class InterpreterTest {
 
     public static void main(String[] args) throws GossipException, IOException {
-        new Interpreter("tests/lambda2.gossip").interp();
+        new Interpreter("tests/list.gossip").interp();
 //        test_all();
     }
 

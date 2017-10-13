@@ -29,5 +29,6 @@ public class GlobalScope extends BaseScope {
         symbols.put("car", Value.CAR);
         symbols.put("cdr", Value.CDR);
         symbols.put("cons", Value.CONS);
+        symbols.put("list", Value.LIST);
     }
 }
